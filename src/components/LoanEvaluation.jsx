@@ -2,18 +2,19 @@
 import React, { useState, useEffect } from 'react';
 import {
   Container,
+  Typography,
   Table,
   TableHead,
   TableRow,
   TableCell,
   TableBody,
   Button,
-  Typography,
-  CircularProgress,
   Alert,
+  CircularProgress,
   Tooltip,
 } from '@mui/material';
 import loanService from '../services/loanService';
+import BackButton from './BackButton'; // Importar BackButton
 
 const LoanEvaluation = () => {
   const [solicitudes, setSolicitudes] = useState([]);
@@ -48,7 +49,7 @@ const LoanEvaluation = () => {
       .evaluateLoan(idSolicitud)
       .then((response) => {
         alert(`Solicitud evaluada: ${response.data}`);
-        fetchSolicitudes();
+        fetchSolicitudes(); // Actualizar la lista después de la evaluación
       })
       .catch((error) => {
         console.error(error);
@@ -69,6 +70,7 @@ const LoanEvaluation = () => {
 
   return (
     <Container style={{ marginTop: '2rem' }}>
+      <BackButton />
       <Typography variant="h5" gutterBottom>
         Evaluación de Solicitudes de Crédito
       </Typography>
@@ -92,9 +94,9 @@ const LoanEvaluation = () => {
               <TableCell>{solicitud.idSolicitud}</TableCell>
               <TableCell>{solicitud.usuario.nombreCompleto}</TableCell>
               <TableCell>{solicitud.tipoPrestamo}</TableCell>
-              <TableCell>${solicitud.montoSolicitado}</TableCell>
+              <TableCell>${solicitud.montoSolicitado.toLocaleString()}</TableCell>
               <TableCell>{solicitud.plazoSolicitado}</TableCell>
-              <TableCell>{solicitud.tasaInteres}</TableCell>
+              <TableCell>{solicitud.tasaInteres}%</TableCell>
               <TableCell>{solicitud.estadoSolicitud}</TableCell>
               <TableCell>
                 {solicitud.estadoSolicitud === 'EN_REVISION_INICIAL' && (

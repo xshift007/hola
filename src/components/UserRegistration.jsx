@@ -4,7 +4,9 @@ import {
   Container, TextField, Button, Typography, MenuItem, 
   Alert, CircularProgress, Grid 
 } from '@mui/material';
+import { useNavigate } from 'react-router-dom'; // Importar useNavigate
 import userService from '../services/userService';
+import BackButton from './BackButton'; // Importar BackButton
 
 const UserRegistration = () => {
   const [usuario, setUsuario] = useState({
@@ -26,9 +28,10 @@ const UserRegistration = () => {
   });
 
   const [errores, setErrores] = useState({});
-  const [success, setSuccess] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate(); // Inicializar navigate
 
   const handleChange = (e) => {
     setUsuario({ ...usuario, [e.target.name]: e.target.value });
@@ -106,28 +109,11 @@ const UserRegistration = () => {
 
     setLoading(true);
     setError(null);
-    setSuccess(null);
 
     userService.registerUser(usuario)
       .then(response => {
-        setSuccess('Usuario registrado con éxito');
-        setUsuario({
-          nombreCompleto: '',
-          fechaNacimiento: '',
-          tipoIdentificacion: '',
-          numeroIdentificacion: '',
-          estadoCivil: '',
-          direccion: '',
-          numeroTelefono: '',
-          correoElectronico: '',
-          ingresosMensuales: '',
-          deudasActuales: '',
-          historialCrediticio: '',
-          tipoEmpleo: '',
-          antiguedadLaboral: '',
-          capacidadAhorro: '',
-          tipoUsuario: 'CLIENTE',
-        });
+        // Registro exitoso, redirigir a Solicitud de Crédito
+        navigate('/solicitud-credito');
       })
       .catch(error => {
         console.error(error);
@@ -144,6 +130,7 @@ const UserRegistration = () => {
 
   return (
     <Container style={{ marginTop: '2rem' }}>
+      <BackButton />
       <Typography variant="h5" gutterBottom>
         Registro de Usuario
       </Typography>
@@ -381,19 +368,14 @@ const UserRegistration = () => {
           </Grid>
         </Grid>
 
-        {/* Mensajes de Error y Éxito */}
+        {/* Mensaje de Error */}
         {error && (
           <Alert severity="error" style={{ marginTop: '1rem' }}>
             {error}
           </Alert>
         )}
-        {success && (
-          <Alert severity="success" style={{ marginTop: '1rem' }}>
-            {success}
-          </Alert>
-        )}
 
-        {/* Botón de Envío */}
+        {/* Botón de Registro */}
         <Button
           type="submit"
           variant="contained"

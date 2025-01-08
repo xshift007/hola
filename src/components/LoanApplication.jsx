@@ -10,8 +10,9 @@ import {
   Alert,
   CircularProgress,
 } from '@mui/material';
-import { Link } from 'react-router-dom'; // Importar Link
+import { useNavigate } from 'react-router-dom'; // Importar useNavigate
 import loanService from '../services/loanService';
+import BackButton from './BackButton'; // Importar BackButton
 
 const LoanApplication = () => {
   const [datos, setDatos] = useState({
@@ -25,11 +26,11 @@ const LoanApplication = () => {
   });
 
   const [errores, setErrores] = useState({});
-  const [success, setSuccess] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Manejar cambios en los campos del formulario
+  const navigate = useNavigate(); // Inicializar navigate
+
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (name === 'comprobanteIngresos' || name === 'comprobanteAvaluo') {
@@ -37,7 +38,6 @@ const LoanApplication = () => {
         ...prevDatos,
         [name]: files[0],
       }));
-      // Limpiar el error del campo al modificarlo
       setErrores((prevErrores) => ({
         ...prevErrores,
         [name]: '',
@@ -47,7 +47,6 @@ const LoanApplication = () => {
         ...prevDatos,
         [name]: value,
       }));
-      // Limpiar el error del campo al modificarlo
       setErrores((prevErrores) => ({
         ...prevErrores,
         [name]: '',
@@ -55,30 +54,23 @@ const LoanApplication = () => {
     }
   };
 
-  // Validaciones manuales
   const validar = () => {
     const nuevosErrores = {};
 
-    // Validar Nombre Completo
     if (!datos.nombreCompleto.trim()) {
       nuevosErrores.nombreCompleto = 'El nombre completo es requerido';
-    } else if (datos.nombreCompleto.trim().length < 3) {
-      nuevosErrores.nombreCompleto = 'El nombre debe tener al menos 3 caracteres';
     }
 
-    // Validar Tipo de Préstamo
     if (!datos.tipoPrestamo) {
       nuevosErrores.tipoPrestamo = 'El tipo de préstamo es requerido';
     }
 
-    // Validar Monto Solicitado
     if (!datos.montoSolicitado) {
       nuevosErrores.montoSolicitado = 'El monto es requerido';
     } else if (isNaN(datos.montoSolicitado) || parseFloat(datos.montoSolicitado) <= 0) {
       nuevosErrores.montoSolicitado = 'Debe ser un número positivo';
     }
 
-    // Validar Plazo Solicitado
     if (!datos.plazoSolicitado) {
       nuevosErrores.plazoSolicitado = 'El plazo es requerido';
     } else if (
@@ -89,14 +81,12 @@ const LoanApplication = () => {
       nuevosErrores.plazoSolicitado = 'Debe ser un número entre 1 y 30';
     }
 
-    // Validar Tasa de Interés
     if (!datos.tasaInteres) {
       nuevosErrores.tasaInteres = 'La tasa de interés es requerida';
     } else if (isNaN(datos.tasaInteres) || parseFloat(datos.tasaInteres) <= 0) {
       nuevosErrores.tasaInteres = 'Debe ser un número positivo';
     }
 
-    // Validar Comprobante de Ingresos
     if (!datos.comprobanteIngresos) {
       nuevosErrores.comprobanteIngresos = 'El comprobante de ingresos es requerido';
     } else {
@@ -109,7 +99,6 @@ const LoanApplication = () => {
       }
     }
 
-    // Validar Comprobante de Avalúo
     if (!datos.comprobanteAvaluo) {
       nuevosErrores.comprobanteAvaluo = 'El comprobante de avalúo es requerido';
     } else {
@@ -123,12 +112,9 @@ const LoanApplication = () => {
     }
 
     setErrores(nuevosErrores);
-
-    // Retornar true si no hay errores
     return Object.keys(nuevosErrores).length === 0;
   };
 
-  // Manejar el envío del formulario
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -138,7 +124,6 @@ const LoanApplication = () => {
 
     setLoading(true);
     setError(null);
-    setSuccess(null);
 
     const formData = new FormData();
     formData.append('nombreCompleto', datos.nombreCompleto.trim());
@@ -149,26 +134,13 @@ const LoanApplication = () => {
     formData.append('comprobanteIngresos', datos.comprobanteIngresos);
     formData.append('comprobanteAvaluo', datos.comprobanteAvaluo);
 
-    loanService
-      .createLoanApplication(formData)
-      .then((response) => {
-        setSuccess('Solicitud de crédito creada con éxito');
-        setDatos({
-          nombreCompleto: '',
-          tipoPrestamo: 'HIPOTECARIO',
-          montoSolicitado: '',
-          plazoSolicitado: '',
-          tasaInteres: '',
-          comprobanteIngresos: null,
-          comprobanteAvaluo: null,
-        });
-        // Limpiar los campos de archivo en el formulario
-        document.getElementsByName('comprobanteIngresos')[0].value = '';
-        document.getElementsByName('comprobanteAvaluo')[0].value = '';
+    loanService.createLoanApplication(formData)
+      .then(response => {
+        // Solicitud exitosa, redirigir a "Ver mis solicitudes"
+        navigate('/estado-solicitudes');
       })
-      .catch((error) => {
+      .catch(error => {
         console.error(error);
-        // Puedes personalizar el mensaje de error según la respuesta del servidor
         if (error.response && error.response.data && error.response.data.message) {
           setError(error.response.data.message);
         } else {
@@ -182,6 +154,7 @@ const LoanApplication = () => {
 
   return (
     <Container style={{ marginTop: '2rem' }}>
+      <BackButton />
       <Typography variant="h5" gutterBottom>
         Solicitud de Crédito Hipotecario
       </Typography>
@@ -197,6 +170,7 @@ const LoanApplication = () => {
               onChange={handleChange}
               error={Boolean(errores.nombreCompleto)}
               helperText={errores.nombreCompleto}
+              variant="outlined"
             />
           </Grid>
 
@@ -211,6 +185,7 @@ const LoanApplication = () => {
               onChange={handleChange}
               error={Boolean(errores.tipoPrestamo)}
               helperText={errores.tipoPrestamo}
+              variant="outlined"
             >
               <MenuItem value="HIPOTECARIO">Hipotecario</MenuItem>
               <MenuItem value="PERSONAL">Personal</MenuItem>
@@ -230,6 +205,7 @@ const LoanApplication = () => {
               onChange={handleChange}
               error={Boolean(errores.montoSolicitado)}
               helperText={errores.montoSolicitado}
+              variant="outlined"
             />
           </Grid>
 
@@ -245,6 +221,7 @@ const LoanApplication = () => {
               onChange={handleChange}
               error={Boolean(errores.plazoSolicitado)}
               helperText={errores.plazoSolicitado}
+              variant="outlined"
             />
           </Grid>
 
@@ -260,6 +237,7 @@ const LoanApplication = () => {
               onChange={handleChange}
               error={Boolean(errores.tasaInteres)}
               helperText={errores.tasaInteres}
+              variant="outlined"
             />
           </Grid>
 
@@ -312,20 +290,15 @@ const LoanApplication = () => {
           </Grid>
         </Grid>
 
-        {/* Mensajes de Error y Éxito */}
+        {/* Mensaje de Error */}
         {error && (
           <Alert severity="error" style={{ marginTop: '1rem' }}>
             {error}
           </Alert>
         )}
-        {success && (
-          <Alert severity="success" style={{ marginTop: '1rem' }}>
-            {success}
-          </Alert>
-        )}
 
-         {/* Botones de Envío y Cancelación */}
-         <Grid container spacing={2} style={{ marginTop: '1rem' }}>
+        {/* Botones de Envío y Cancelación */}
+        <Grid container spacing={2} style={{ marginTop: '1rem' }}>
           <Grid item xs={6}>
             <Button
               type="submit"
@@ -341,11 +314,12 @@ const LoanApplication = () => {
             <Button
               variant="outlined"
               color="secondary"
-              component={Link}
-              to="/"
+              component={Button}
+              to="/estado-solicitudes"
+              onClick={() => navigate('/estado-solicitudes')} // Redirigir a Mis Solicitudes
               fullWidth
             >
-              Cancelar
+              Ver Mis Solicitudes
             </Button>
           </Grid>
         </Grid>

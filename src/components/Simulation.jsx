@@ -1,17 +1,29 @@
 // src/components/Simulation.jsx
 import React, { useState } from 'react';
-import { Container, TextField, Button, Typography, MenuItem } from '@mui/material';
+import {
+  Container,
+  TextField,
+  Button,
+  Typography,
+  MenuItem,
+  Grid,
+  Alert,
+  CircularProgress,
+} from '@mui/material';
 import loanService from '../services/loanService';
+import BackButton from './BackButton'; // Importar BackButton
 
 const Simulation = () => {
   const [datos, setDatos] = useState({
     montoDeseado: '',
     plazo: '',
     tasaInteres: '',
-    tipoPrestamo: 'HIPOTECARIO', // Valor por defecto
+    tipoPrestamo: 'HIPOTECARIO',
   });
 
   const [resultado, setResultado] = useState(null);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setDatos({ ...datos, [e.target.name]: e.target.value });
@@ -22,7 +34,7 @@ const Simulation = () => {
 
     // Validar que todos los campos estén llenos
     if (!datos.montoDeseado || !datos.plazo || !datos.tasaInteres || !datos.tipoPrestamo) {
-      alert('Por favor, completa todos los campos requeridos.');
+      setError('Por favor, completa todos los campos requeridos.');
       return;
     }
 
@@ -33,85 +45,134 @@ const Simulation = () => {
       tipoPrestamo: datos.tipoPrestamo,
     };
 
+    setLoading(true);
+    setError(null);
+    setResultado(null);
+
     loanService
       .simulateLoan(simulationData)
       .then((response) => {
         setResultado(response.data);
       })
       .catch((error) => {
+        console.error(error);
         if (error.response && error.response.data) {
-          // Mostrar mensajes de error específicos del back-end
           const errorMessages = Object.values(error.response.data).join('\n');
-          alert(`Error al simular el crédito:\n${errorMessages}`);
+          setError(`Error al simular el crédito:\n${errorMessages}`);
         } else {
-          console.error(error);
-          alert('Error al simular el crédito');
+          setError('Error al simular el crédito');
         }
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
   return (
     <Container style={{ marginTop: '2rem' }}>
-      <Typography variant="h5">Simulación de Crédito</Typography> {/* Título actualizado */}
+      <BackButton />
+      <Typography variant="h5" gutterBottom>
+        Simulación de Crédito Hipotecario
+      </Typography>
       <form onSubmit={handleSubmit}>
-        <TextField
-          name="montoDeseado"
-          label="Monto Solicitado"
+        <Grid container spacing={2}>
+          {/* Monto Solicitado */}
+          <Grid item xs={12}>
+            <TextField
+              name="montoDeseado"
+              label="Monto Solicitado"
+              fullWidth
+              margin="normal"
+              value={datos.montoDeseado}
+              onChange={handleChange}
+              required
+              type="number"
+              inputProps={{ min: "0", step: "0.01" }}
+              variant="outlined"
+            />
+          </Grid>
+
+          {/* Plazo Solicitado */}
+          <Grid item xs={12}>
+            <TextField
+              name="plazo"
+              label="Plazo Solicitado (años)"
+              fullWidth
+              margin="normal"
+              value={datos.plazo}
+              onChange={handleChange}
+              required
+              type="number"
+              inputProps={{ min: "1", max: "30", step: "1" }}
+              variant="outlined"
+            />
+          </Grid>
+
+          {/* Tasa de Interés */}
+          <Grid item xs={12}>
+            <TextField
+              name="tasaInteres"
+              label="Tasa de Interés (%)"
+              fullWidth
+              margin="normal"
+              value={datos.tasaInteres}
+              onChange={handleChange}
+              required
+              type="number"
+              inputProps={{ min: "0", step: "0.01" }}
+              variant="outlined"
+            />
+          </Grid>
+
+          {/* Tipo de Préstamo */}
+          <Grid item xs={12}>
+            <TextField
+              name="tipoPrestamo"
+              label="Tipo de Préstamo"
+              select
+              fullWidth
+              margin="normal"
+              value={datos.tipoPrestamo}
+              onChange={handleChange}
+              required
+              variant="outlined"
+            >
+              <MenuItem value="HIPOTECARIO">Hipotecario</MenuItem>
+              <MenuItem value="PERSONAL">Personal</MenuItem>
+              <MenuItem value="EMPRESARIAL">Empresarial</MenuItem>
+              {/* Añadir más opciones si es necesario */}
+            </TextField>
+          </Grid>
+        </Grid>
+
+        {/* Botón de Simulación */}
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          style={{ marginTop: '1rem' }}
+          disabled={loading}
           fullWidth
-          margin="normal"
-          value={datos.montoDeseado}
-          onChange={handleChange}
-          required
-          type="number"
-          inputProps={{ min: "0", step: "0.01" }}
-        />
-        <TextField
-          name="plazo"
-          label="Plazo Solicitado (años)"
-          fullWidth
-          margin="normal"
-          value={datos.plazo}
-          onChange={handleChange}
-          required
-          type="number"
-          inputProps={{ min: "1", max: "30", step: "1" }}
-        />
-        <TextField
-          name="tasaInteres"
-          label="Tasa de Interés (%)"
-          fullWidth
-          margin="normal"
-          value={datos.tasaInteres}
-          onChange={handleChange}
-          required
-          type="number"
-          inputProps={{ min: "0", step: "0.01" }}
-        />
-        <TextField
-          name="tipoPrestamo"
-          label="Tipo de Préstamo"
-          select
-          fullWidth
-          margin="normal"
-          value={datos.tipoPrestamo}
-          onChange={handleChange}
-          required
         >
-          <MenuItem value="HIPOTECARIO">Hipotecario</MenuItem>
-          <MenuItem value="PERSONAL">Personal</MenuItem>
-          <MenuItem value="EMPRESARIAL">Empresarial</MenuItem> {/* Nueva opción agregada */}
-        </TextField>
-        <Button type="submit" variant="contained" color="primary">
-          Simular
+          {loading ? <CircularProgress size={24} color="inherit" /> : 'Simular'}
         </Button>
       </form>
+
+      {/* Resultados */}
       {resultado && (
-        <div style={{ marginTop: '2rem' }}>
+        <Alert severity="success" style={{ marginTop: '2rem' }}>
           <Typography variant="h6">Resultados de la Simulación:</Typography>
-          <Typography>Cuota Mensual: {resultado.cuotaMensual}</Typography>
-          <Typography>Costo Total: {resultado.totalPagado}</Typography>
-          <Typography>Total de Intereses: {resultado.totalIntereses}</Typography>
-        </div>
+          <Typography>Cuota Mensual: ${resultado.cuotaMensual.toLocaleString()}</Typography>
+          <Typography>Costo Total: ${resultado.totalPagado.toLocaleString()}</Typography>
+          <Typography>Total de Intereses: ${resultado.totalIntereses.toLocaleString()}</Typography>
+        </Alert>
+      )}
+
+      {/* Mensaje de Error */}
+      {error && (
+        <Alert severity="error" style={{ marginTop: '1rem' }}>
+          {error}
+        </Alert>
       )}
     </Container>
   );
