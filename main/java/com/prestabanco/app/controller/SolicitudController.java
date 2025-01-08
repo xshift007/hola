@@ -9,6 +9,7 @@ import com.prestabanco.app.service.FileStorageService;
 import com.prestabanco.app.service.SolicitudService;
 import com.prestabanco.app.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.http.MediaType;
@@ -104,12 +105,12 @@ public class SolicitudController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void eliminarSolicitud(@PathVariable Long id) {
-       Optional<Solicitud> solicitud =  solicitudService.obtenerSolicitudPorId(id);
-       if(solicitud.isPresent()){
+        Optional<Solicitud> solicitud =  solicitudService.obtenerSolicitudPorId(id);
+        if(solicitud.isPresent()){
             solicitudService.eliminarSolicitud(id);
-       }else{
-        throw new ResourceNotFoundException("Solicitud no encontrada");
-       }
+        } else{
+            throw new ResourceNotFoundException("Solicitud no encontrada");
+        }
     }
 
     @PostMapping("/simular")
