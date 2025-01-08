@@ -10,7 +10,8 @@ import {
   Alert,
   CircularProgress,
 } from '@mui/material';
-import loanService from '../services/loanService'; // Asegúrate de que la ruta es correcta
+import { Link } from 'react-router-dom'; // Importar Link
+import loanService from '../services/loanService';
 
 const LoanApplication = () => {
   const [datos, setDatos] = useState({
@@ -323,17 +324,31 @@ const LoanApplication = () => {
           </Alert>
         )}
 
-        {/* Botón de Envío */}
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          style={{ marginTop: '1rem' }}
-          disabled={loading}
-          fullWidth
-        >
-          {loading ? <CircularProgress size={24} color="inherit" /> : 'Solicitar Crédito'}
-        </Button>
+         {/* Botones de Envío y Cancelación */}
+         <Grid container spacing={2} style={{ marginTop: '1rem' }}>
+          <Grid item xs={6}>
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              disabled={loading}
+              fullWidth
+            >
+              {loading ? <CircularProgress size={24} color="inherit" /> : 'Solicitar Crédito'}
+            </Button>
+          </Grid>
+          <Grid item xs={6}>
+            <Button
+              variant="outlined"
+              color="secondary"
+              component={Link}
+              to="/"
+              fullWidth
+            >
+              Cancelar
+            </Button>
+          </Grid>
+        </Grid>
       </form>
     </Container>
   );

@@ -11,6 +11,7 @@ import {
   Typography,
   CircularProgress,
   Alert,
+  Tooltip,
 } from '@mui/material';
 import loanService from '../services/loanService';
 
@@ -41,10 +42,10 @@ const LoanEvaluation = () => {
       });
   };
 
-  const evaluarSolicitud = (id) => {
-    setEvaluando(id);
+  const evaluarSolicitud = (idSolicitud) => {
+    setEvaluando(idSolicitud);
     loanService
-      .evaluateLoan(id)
+      .evaluateLoan(idSolicitud)
       .then((response) => {
         alert(`Solicitud evaluada: ${response.data}`);
         fetchSolicitudes();
@@ -97,18 +98,20 @@ const LoanEvaluation = () => {
               <TableCell>{solicitud.estadoSolicitud}</TableCell>
               <TableCell>
                 {solicitud.estadoSolicitud === 'EN_REVISION_INICIAL' && (
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={() => evaluarSolicitud(solicitud.idSolicitud)}
-                    disabled={evaluando === solicitud.idSolicitud}
-                  >
-                    {evaluando === solicitud.idSolicitud ? (
-                      <CircularProgress size={24} color="inherit" />
-                    ) : (
-                      'Evaluar'
-                    )}
-                  </Button>
+                  <Tooltip title="Evaluar esta solicitud">
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={() => evaluarSolicitud(solicitud.idSolicitud)}
+                      disabled={evaluando === solicitud.idSolicitud}
+                    >
+                      {evaluando === solicitud.idSolicitud ? (
+                        <CircularProgress size={24} color="inherit" />
+                      ) : (
+                        'Evaluar'
+                      )}
+                    </Button>
+                  </Tooltip>
                 )}
               </TableCell>
             </TableRow>
