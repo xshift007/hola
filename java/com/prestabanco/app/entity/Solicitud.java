@@ -22,8 +22,11 @@ public class Solicitud {
     @JoinColumn(name = "idUsuario")
     private Usuario usuario;
 
+    @Enumerated(EnumType.STRING)
+    private TipoPrestamo tipoPrestamo;
+
+
     private LocalDateTime fechaSolicitud;
-    private String tipoPrestamo;
     private BigDecimal montoSolicitado;
     private Integer plazoSolicitado; // en años
     private BigDecimal tasaInteres; // en porcentaje

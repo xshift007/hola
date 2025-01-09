@@ -1,11 +1,4 @@
-package com.prestabanco.app.service;
-
-import com.prestabanco.app.entity.Solicitud;
-import com.prestabanco.app.entity.Usuario;
-import com.prestabanco.app.repository.SolicitudRepository;
-import com.prestabanco.app.repository.UsuarioRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+// src/main/java/com/prestabanco/app/service/SolicitudService.java
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -125,6 +118,9 @@ public class SolicitudService {
             return "RECHAZADA";
         }
 
+        // Cálculo de Costos Totales (Agregar aquí)
+        calcularCostosTotales(solicitud);
+
         // Si pasa todas las evaluaciones
         solicitud.setEstadoSolicitud("APROBADA");
         solicitud.setFechaAprobacionRechazo(LocalDateTime.now());
@@ -148,6 +144,31 @@ public class SolicitudService {
         return deudas.divide(usuario.getIngresosMensuales(), 2, RoundingMode.HALF_UP);
     }
 
+    private void calcularCostosTotales(Solicitud solicitud) {
+        BigDecimal monto = solicitud.getMontoSolicitado();
+        Integer plazoAnios = solicitud.getPlazoSolicitado();
+        BigDecimal tasaAnual = solicitud.getTasaInteres();
 
+        // Cuota Mensual
+        BigDecimal cuotaMensual = calcularCuotaMensual(monto, plazoAnios, tasaAnual);
+        solicitud.setCuotaMensual(cuotaMensual);
 
+        // Seguros
+        BigDecimal seguroDesgravamen = monto.multiply(new BigDecimal("0.0003")).multiply(BigDecimal.valueOf(plazoAnios * 12));
+        BigDecimal seguroIncendio = new BigDecimal("20000").multiply(BigDecimal.valueOf(plazoAnios * 12));
+
+        // Comisión por Administración
+        BigDecimal comisionAdministracion = monto.multiply(new BigDecimal("0.01"));
+
+        // Costo Total Mensual
+        BigDecimal costoMensual = cuotaMensual.add(seguroDesgravamen.divide(BigDecimal.valueOf(plazoAnios * 12), 2, RoundingMode.HALF_UP))
+                                                  .add(seguroIncendio.divide(BigDecimal.valueOf(plazoAnios * 12), 2, RoundingMode.HALF_UP));
+
+        // Costo Total durante la Vida del Préstamo
+        BigDecimal costoTotal = costoMensual.multiply(BigDecimal.valueOf(plazoAnios * 12))
+                                            .add(comisionAdministracion);
+
+        solicitud.setTotalPagado(costoTotal);
+        solicitud.setTotalIntereses(costoTotal.subtract(monto));
+    }
 }

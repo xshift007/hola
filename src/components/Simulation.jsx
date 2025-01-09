@@ -1,4 +1,5 @@
 // src/components/Simulation.jsx
+
 import React, { useState } from 'react';
 import {
   Container,
@@ -9,16 +10,22 @@ import {
   Grid,
   Alert,
   CircularProgress,
+  Box,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
 } from '@mui/material';
 import loanService from '../services/loanService';
 import BackButton from './BackButton'; // Importar BackButton
+import CheckIcon from '@mui/icons-material/Check';
 
 const Simulation = () => {
   const [datos, setDatos] = useState({
     montoDeseado: '',
     plazo: '',
     tasaInteres: '',
-    tipoPrestamo: 'HIPOTECARIO',
+    tipoPrestamo: 'PRIMERA_VIVIENDA', // Cambiado al valor del enum
   });
 
   const [resultado, setResultado] = useState(null);
@@ -27,14 +34,43 @@ const Simulation = () => {
 
   const handleChange = (e) => {
     setDatos({ ...datos, [e.target.name]: e.target.value });
+    setError(null); // Limpiar errores al cambiar datos
+    setResultado(null);
+  };
+
+  const validar = () => {
+    const nuevosErrores = {};
+
+    if (!datos.montoDeseado) {
+      nuevosErrores.montoDeseado = 'El monto deseado es requerido';
+    } else if (isNaN(datos.montoDeseado) || parseFloat(datos.montoDeseado) <= 0) {
+      nuevosErrores.montoDeseado = 'Debe ser un número positivo';
+    }
+
+    if (!datos.plazo) {
+      nuevosErrores.plazo = 'El plazo es requerido';
+    } else if (isNaN(datos.plazo) || parseInt(datos.plazo, 10) < 1 || parseInt(datos.plazo, 10) > 30) {
+      nuevosErrores.plazo = 'Debe ser un número entre 1 y 30';
+    }
+
+    if (!datos.tasaInteres) {
+      nuevosErrores.tasaInteres = 'La tasa de interés es requerida';
+    } else if (isNaN(datos.tasaInteres) || parseFloat(datos.tasaInteres) <= 0) {
+      nuevosErrores.tasaInteres = 'Debe ser un número positivo';
+    }
+
+    if (!datos.tipoPrestamo) {
+      nuevosErrores.tipoPrestamo = 'El tipo de préstamo es requerido';
+    }
+
+    setError(nuevosErrores);
+    return Object.keys(nuevosErrores).length === 0;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Validar que todos los campos estén llenos
-    if (!datos.montoDeseado || !datos.plazo || !datos.tasaInteres || !datos.tipoPrestamo) {
-      setError('Por favor, completa todos los campos requeridos.');
+    if (!validar()) {
       return;
     }
 
@@ -68,6 +104,62 @@ const Simulation = () => {
       });
   };
 
+  // Definir los requisitos según el tipo de préstamo seleccionado
+  const obtenerRequisitos = () => {
+    switch (datos.tipoPrestamo) {
+      case 'PRIMERA_VIVIENDA':
+        return {
+          plazo: { min: 30, max: 30 },
+          tasa: { min: 3.5, max: 5.0 },
+          porcentajeFinanciamiento: 80,
+          requisitos: [
+            'Comprobante de ingresos',
+            'Certificado de avalúo',
+            'Historial crediticio',
+          ],
+        };
+      case 'SEGUNDA_VIVIENDA':
+        return {
+          plazo: { min: 20, max: 20 },
+          tasa: { min: 4.0, max: 6.0 },
+          porcentajeFinanciamiento: 70,
+          requisitos: [
+            'Comprobante de ingresos',
+            'Certificado de avalúo',
+            'Escritura de la primera vivienda',
+            'Historial crediticio',
+          ],
+        };
+      case 'PROPIEDADES_COMERCIALES':
+        return {
+          plazo: { min: 25, max: 25 },
+          tasa: { min: 5.0, max: 7.0 },
+          porcentajeFinanciamiento: 60,
+          requisitos: [
+            'Estado financiero del negocio',
+            'Comprobante de ingresos',
+            'Certificado de avalúo',
+            'Plan de negocios',
+          ],
+        };
+      case 'REMODELACION':
+        return {
+          plazo: { min: 15, max: 15 },
+          tasa: { min: 4.5, max: 6.0 },
+          porcentajeFinanciamiento: 50,
+          requisitos: [
+            'Comprobante de ingresos',
+            'Presupuesto de la remodelación',
+            'Certificado de avalúo actualizado',
+          ],
+        };
+      default:
+        return {};
+    }
+  };
+
+  const requisitos = obtenerRequisitos();
+
   return (
     <Container style={{ marginTop: '2rem' }}>
       <BackButton />
@@ -89,6 +181,9 @@ const Simulation = () => {
               type="number"
               inputProps={{ min: "0", step: "0.01" }}
               variant="outlined"
+              InputProps={{
+                startAdornment: <Typography variant="body1">$&nbsp;</Typography>,
+              }}
             />
           </Grid>
 
@@ -96,14 +191,18 @@ const Simulation = () => {
           <Grid item xs={12}>
             <TextField
               name="plazo"
-              label="Plazo Solicitado (años)"
+              label={`Plazo Solicitado (${requisitos.plazo ? `${requisitos.plazo.min} años` : 'años'})`}
               fullWidth
               margin="normal"
               value={datos.plazo}
               onChange={handleChange}
               required
               type="number"
-              inputProps={{ min: "1", max: "30", step: "1" }}
+              inputProps={{
+                min: requisitos.plazo ? requisitos.plazo.min : '1',
+                max: requisitos.plazo ? requisitos.plazo.max : '30',
+                step: '1',
+              }}
               variant="outlined"
             />
           </Grid>
@@ -112,14 +211,14 @@ const Simulation = () => {
           <Grid item xs={12}>
             <TextField
               name="tasaInteres"
-              label="Tasa de Interés (%)"
+              label={`Tasa de Interés (%) (${requisitos.tasa ? `${requisitos.tasa.min}% - ${requisitos.tasa.max}%` : ''})`}
               fullWidth
               margin="normal"
               value={datos.tasaInteres}
               onChange={handleChange}
               required
               type="number"
-              inputProps={{ min: "0", step: "0.01" }}
+              inputProps={{ min: requisitos.tasa ? requisitos.tasa.min : '0', step: '0.01' }}
               variant="outlined"
             />
           </Grid>
@@ -127,22 +226,42 @@ const Simulation = () => {
           {/* Tipo de Préstamo */}
           <Grid item xs={12}>
             <TextField
-              name="tipoPrestamo"
-              label="Tipo de Préstamo"
               select
               fullWidth
-              margin="normal"
+              name="tipoPrestamo"
+              label="Tipo de Préstamo"
               value={datos.tipoPrestamo}
               onChange={handleChange}
               required
               variant="outlined"
             >
-              <MenuItem value="HIPOTECARIO">Hipotecario</MenuItem>
-              <MenuItem value="PERSONAL">Personal</MenuItem>
-              <MenuItem value="EMPRESARIAL">Empresarial</MenuItem>
-              {/* Añadir más opciones si es necesario */}
+              <MenuItem value="PRIMERA_VIVIENDA">Primera Vivienda</MenuItem>
+              <MenuItem value="SEGUNDA_VIVIENDA">Segunda Vivienda</MenuItem>
+              <MenuItem value="PROPIEDADES_COMERCIALES">Propiedades Comerciales</MenuItem>
+              <MenuItem value="REMODELACION">Remodelación</MenuItem>
             </TextField>
           </Grid>
+
+          {/* Mostrar Requisitos Según Tipo de Préstamo Seleccionado */}
+          {requisitos.requisitos && (
+            <Grid item xs={12}>
+              <Box sx={{ border: '1px solid red', padding: '1rem', borderRadius: '4px' }}>
+                <Typography variant="subtitle1" color="error" gutterBottom>
+                  Requisitos para {datos.tipoPrestamo.replace('_', ' ')}:
+                </Typography>
+                <List>
+                  {requisitos.requisitos.map((req, index) => (
+                    <ListItem key={index}>
+                      <ListItemIcon>
+                        <CheckIcon color="error" />
+                      </ListItemIcon>
+                      <ListItemText primary={req} />
+                    </ListItem>
+                  ))}
+                </List>
+              </Box>
+            </Grid>
+          )}
         </Grid>
 
         {/* Botón de Simulación */}
