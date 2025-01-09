@@ -8,11 +8,7 @@ const simulateLoan = (simulationData) => {
 
 // Crear solicitud de crédito
 const createLoanApplication = (formData) => {
-  return api.post('/solicitudes/crear-con-usuario', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
+  return api.post('/solicitudes/crear-con-usuario', formData);
 };
 
 // Obtener todas las solicitudes (para evaluación)

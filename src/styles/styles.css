@@ -1,12 +1,11 @@
 /* src/styles/styles.css */
 
 body {
-    margin: 0;
-    font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
-  }
-  
-  a {
-    text-decoration: none;
-    color: inherit;
-  }
-  
+  margin: 0;
+  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}

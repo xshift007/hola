@@ -10,7 +10,7 @@ import {
   Alert,
   CircularProgress,
 } from '@mui/material';
-import { useNavigate } from 'react-router-dom'; // Importar useNavigate
+import { useNavigate } from 'react-router-dom';
 import loanService from '../services/loanService';
 import BackButton from './BackButton'; // Importar BackButton
 
@@ -29,7 +29,7 @@ const LoanApplication = () => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const navigate = useNavigate(); // Inicializar navigate
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -136,7 +136,7 @@ const LoanApplication = () => {
 
     loanService.createLoanApplication(formData)
       .then(response => {
-        // Solicitud exitosa, redirigir a "Ver mis solicitudes"
+        // Solicitud exitosa, redirigir a "Ver Mis Solicitudes"
         navigate('/estado-solicitudes');
       })
       .catch(error => {
@@ -314,9 +314,7 @@ const LoanApplication = () => {
             <Button
               variant="outlined"
               color="secondary"
-              component={Button}
-              to="/estado-solicitudes"
-              onClick={() => navigate('/estado-solicitudes')} // Redirigir a Mis Solicitudes
+              onClick={() => navigate('/estado-solicitudes')}
               fullWidth
             >
               Ver Mis Solicitudes
