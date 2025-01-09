@@ -8,6 +8,8 @@ import com.prestabanco.app.exception.ResourceNotFoundException;
 import com.prestabanco.app.service.FileStorageService;
 import com.prestabanco.app.service.SolicitudService;
 import com.prestabanco.app.service.UsuarioService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +28,9 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/solicitudes")
 public class SolicitudController {
+    
+    private static final Logger logger = LoggerFactory.getLogger(SolicitudController.class);
+
 
     @Autowired
     private SolicitudService solicitudService;

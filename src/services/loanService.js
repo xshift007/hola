@@ -35,6 +35,7 @@ const deleteLoan = (idSolicitud) => {
   return api.delete(`/solicitudes/${idSolicitud}`);
 };
 
+
 export default {
   simulateLoan,
   createLoanApplication,
