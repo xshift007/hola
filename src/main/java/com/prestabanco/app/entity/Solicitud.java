@@ -45,4 +45,9 @@ public class Solicitud {
 
     @Transient
     private String nombreCompleto; // Campo transitorio para recibir el nombre del usuario
+
+    // Campos adicionales para costos
+    private BigDecimal cuotaMensual;
+    private BigDecimal totalPagado;
+    private BigDecimal totalIntereses;
 }

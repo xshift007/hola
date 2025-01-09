@@ -14,12 +14,13 @@ import com.prestabanco.app.service.UsuarioService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+// Asegúrate de importar correctamente las clases de validación
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.http.MediaType;
 
-import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
@@ -31,7 +32,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/solicitudes")
 public class SolicitudController {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(SolicitudController.class);
 
 
@@ -46,7 +47,7 @@ public class SolicitudController {
 
     /**
      * Endpoint para crear una solicitud de crédito con usuario existente.
-     * 
+     *
      * @param tipoPrestamo        Tipo de préstamo seleccionado (enumeración TipoPrestamo).
      * @param montoSolicitado     Monto solicitado para el préstamo.
      * @param plazoSolicitado     Plazo solicitado en años.
@@ -93,7 +94,7 @@ public class SolicitudController {
 
     /**
      * Endpoint para obtener las solicitudes de crédito de un usuario por su nombre completo.
-     * 
+     *
      * @param nombreCompleto Nombre completo del usuario.
      * @return Lista de solicitudes de crédito.
      */
@@ -109,7 +110,7 @@ public class SolicitudController {
 
     /**
      * Endpoint para obtener una solicitud de crédito por su ID.
-     * 
+     *
      * @param id ID de la solicitud.
      * @return Solicitud encontrada.
      */
@@ -120,7 +121,7 @@ public class SolicitudController {
 
     /**
      * Endpoint para obtener todas las solicitudes de crédito.
-     * 
+     *
      * @return Lista de todas las solicitudes.
      */
     @GetMapping
@@ -130,7 +131,7 @@ public class SolicitudController {
 
     /**
      * Endpoint para evaluar una solicitud de crédito por su ID.
-     * 
+     *
      * @param id ID de la solicitud.
      * @return Resultado de la evaluación ("APROBADA" o "RECHAZADA").
      */
@@ -147,7 +148,7 @@ public class SolicitudController {
 
     /**
      * Endpoint para eliminar una solicitud de crédito por su ID.
-     * 
+     *
      * @param id ID de la solicitud.
      */
     @DeleteMapping("/{id}")
@@ -163,7 +164,7 @@ public class SolicitudController {
 
     /**
      * Endpoint para simular un préstamo hipotecario.
-     * 
+     *
      * @param request Objeto con los datos de la simulación.
      * @return Respuesta con los resultados de la simulación.
      */

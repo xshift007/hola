@@ -1,4 +1,14 @@
 // src/main/java/com/prestabanco/app/service/SolicitudService.java
+package com.prestabanco.app.service;
+
+import com.prestabanco.app.dto.SimulacionRequest;
+import com.prestabanco.app.dto.SimulacionResponse;
+import com.prestabanco.app.entity.Solicitud;
+import com.prestabanco.app.entity.Usuario;
+import com.prestabanco.app.repository.SolicitudRepository;
+import com.prestabanco.app.repository.UsuarioRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -9,6 +19,7 @@ import java.time.Period;
 import java.util.List;
 import java.util.Optional;
 
+
 @Service
 public class SolicitudService {
 
@@ -17,6 +28,29 @@ public class SolicitudService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    public SimulacionResponse simularPrestamo(SimulacionRequest request) {
+        BigDecimal monto = request.getMontoDeseado();
+        BigDecimal tasaAnual = request.getTasaInteres();
+        Integer plazoAnios = request.getPlazo();
+        Integer plazoMeses = plazoAnios * 12;
+        BigDecimal tasaMensual = tasaAnual.divide(BigDecimal.valueOf(12 * 100), 10, RoundingMode.HALF_UP);
+
+        BigDecimal unoMasR = BigDecimal.ONE.add(tasaMensual);
+        BigDecimal potencia = unoMasR.pow(plazoMeses, MathContext.DECIMAL128);
+        BigDecimal cuotaMensual = monto.multiply(tasaMensual.multiply(potencia))
+                .divide(potencia.subtract(BigDecimal.ONE), 2, RoundingMode.HALF_UP);
+
+        BigDecimal totalPagado = cuotaMensual.multiply(BigDecimal.valueOf(plazoMeses));
+        BigDecimal totalIntereses = totalPagado.subtract(monto);
+
+        SimulacionResponse response = new SimulacionResponse();
+        response.setCuotaMensual(cuotaMensual);
+        response.setTotalPagado(totalPagado);
+        response.setTotalIntereses(totalIntereses);
+
+        return response;
+    }
 
     public Solicitud crearSolicitud(Solicitud solicitud) {
         solicitud.setFechaSolicitud(LocalDateTime.now());
