@@ -63,20 +63,21 @@ const LoanStatus = () => {
     setDeleteDialogOpen(true);
   };
 
-  // src/components/LoanStatus.jsx
   const handleDeleteConfirm = () => {
-    loanService.deleteLoan(selectedLoanId)
+    loanService
+      .deleteLoan(selectedLoanId)
       .then(() => {
         setSolicitudes(solicitudes.filter(solicitud => solicitud.idSolicitud !== selectedLoanId));
         setDeleteDialogOpen(false);
+        setSelectedLoanId(null);
       })
       .catch((error) => {
         console.error(error);
         setError('Error al eliminar la solicitud');
         setDeleteDialogOpen(false);
+        setSelectedLoanId(null);
       });
   };
-
 
   const handleDeleteCancel = () => {
     setDeleteDialogOpen(false);

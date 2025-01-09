@@ -1,5 +1,4 @@
 // src/components/LoanApplication.jsx
-
 import React, { useState } from 'react';
 import {
   Container,
@@ -10,21 +9,15 @@ import {
   Grid,
   Alert,
   CircularProgress,
-  Box,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom'; // Importar useNavigate
 import loanService from '../services/loanService';
 import BackButton from './BackButton'; // Importar BackButton
-import CheckIcon from '@mui/icons-material/Check';
 
 const LoanApplication = () => {
   const [datos, setDatos] = useState({
     nombreCompleto: '',
-    tipoPrestamo: 'PRIMERA_VIVIENDA', // Cambiado al valor del enum
+    tipoPrestamo: 'HIPOTECARIO',
     montoSolicitado: '',
     plazoSolicitado: '',
     tasaInteres: '',
@@ -159,62 +152,6 @@ const LoanApplication = () => {
       });
   };
 
-  // Definir los requisitos según el tipo de préstamo seleccionado
-  const obtenerRequisitos = () => {
-    switch (datos.tipoPrestamo) {
-      case 'PRIMERA_VIVIENDA':
-        return {
-          plazo: { min: 30, max: 30 },
-          tasa: { min: 3.5, max: 5.0 },
-          porcentajeFinanciamiento: 80,
-          requisitos: [
-            'Comprobante de ingresos',
-            'Certificado de avalúo',
-            'Historial crediticio',
-          ],
-        };
-      case 'SEGUNDA_VIVIENDA':
-        return {
-          plazo: { min: 20, max: 20 },
-          tasa: { min: 4.0, max: 6.0 },
-          porcentajeFinanciamiento: 70,
-          requisitos: [
-            'Comprobante de ingresos',
-            'Certificado de avalúo',
-            'Escritura de la primera vivienda',
-            'Historial crediticio',
-          ],
-        };
-      case 'PROPIEDADES_COMERCIALES':
-        return {
-          plazo: { min: 25, max: 25 },
-          tasa: { min: 5.0, max: 7.0 },
-          porcentajeFinanciamiento: 60,
-          requisitos: [
-            'Estado financiero del negocio',
-            'Comprobante de ingresos',
-            'Certificado de avalúo',
-            'Plan de negocios',
-          ],
-        };
-      case 'REMODELACION':
-        return {
-          plazo: { min: 15, max: 15 },
-          tasa: { min: 4.5, max: 6.0 },
-          porcentajeFinanciamiento: 50,
-          requisitos: [
-            'Comprobante de ingresos',
-            'Presupuesto de la remodelación',
-            'Certificado de avalúo actualizado',
-          ],
-        };
-      default:
-        return {};
-    }
-  };
-
-  const requisitos = obtenerRequisitos();
-
   return (
     <Container style={{ marginTop: '2rem' }}>
       <BackButton />
@@ -238,7 +175,7 @@ const LoanApplication = () => {
           </Grid>
 
           {/* Tipo de Préstamo */}
-          <Grid item xs={12}>
+          <Grid item xs={12} sm={6}>
             <TextField
               select
               fullWidth
@@ -250,36 +187,14 @@ const LoanApplication = () => {
               helperText={errores.tipoPrestamo}
               variant="outlined"
             >
-              <MenuItem value="PRIMERA_VIVIENDA">Primera Vivienda</MenuItem>
-              <MenuItem value="SEGUNDA_VIVIENDA">Segunda Vivienda</MenuItem>
-              <MenuItem value="PROPIEDADES_COMERCIALES">Propiedades Comerciales</MenuItem>
-              <MenuItem value="REMODELACION">Remodelación</MenuItem>
+              <MenuItem value="HIPOTECARIO">Hipotecario</MenuItem>
+              <MenuItem value="PERSONAL">Personal</MenuItem>
+              {/* Añadir más opciones si es necesario */}
             </TextField>
           </Grid>
 
-          {/* Mostrar Requisitos Según Tipo de Préstamo Seleccionado */}
-          {requisitos.requisitos && (
-            <Grid item xs={12}>
-              <Box sx={{ border: '1px solid red', padding: '1rem', borderRadius: '4px' }}>
-                <Typography variant="subtitle1" color="error" gutterBottom>
-                  Requisitos para {datos.tipoPrestamo.replace('_', ' ')}:
-                </Typography>
-                <List>
-                  {requisitos.requisitos.map((req, index) => (
-                    <ListItem key={index}>
-                      <ListItemIcon>
-                        <CheckIcon color="error" />
-                      </ListItemIcon>
-                      <ListItemText primary={req} />
-                    </ListItem>
-                  ))}
-                </List>
-              </Box>
-            </Grid>
-          )}
-
           {/* Monto Solicitado */}
-          <Grid item xs={12}>
+          <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
               name="montoSolicitado"
@@ -291,24 +206,17 @@ const LoanApplication = () => {
               error={Boolean(errores.montoSolicitado)}
               helperText={errores.montoSolicitado}
               variant="outlined"
-              InputProps={{
-                startAdornment: <Typography variant="body1">$&nbsp;</Typography>,
-              }}
             />
           </Grid>
 
           {/* Plazo Solicitado */}
-          <Grid item xs={12}>
+          <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
               name="plazoSolicitado"
-              label={`Plazo Solicitado (${requisitos.plazo ? `${requisitos.plazo.min} años` : 'años'})`}
+              label="Plazo Solicitado (años)"
               type="number"
-              inputProps={{
-                min: requisitos.plazo ? requisitos.plazo.min : '1',
-                max: requisitos.plazo ? requisitos.plazo.max : '30',
-                step: '1',
-              }}
+              inputProps={{ min: '1', max: '30', step: '1' }}
               value={datos.plazoSolicitado}
               onChange={handleChange}
               error={Boolean(errores.plazoSolicitado)}
@@ -318,13 +226,13 @@ const LoanApplication = () => {
           </Grid>
 
           {/* Tasa de Interés */}
-          <Grid item xs={12}>
+          <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
               name="tasaInteres"
-              label={`Tasa de Interés (%) (${requisitos.tasa ? `${requisitos.tasa.min}% - ${requisitos.tasa.max}%` : ''})`}
+              label="Tasa de Interés (%)"
               type="number"
-              inputProps={{ min: requisitos.tasa ? requisitos.tasa.min : '0', step: '0.01' }}
+              inputProps={{ min: '0', step: '0.01' }}
               value={datos.tasaInteres}
               onChange={handleChange}
               error={Boolean(errores.tasaInteres)}

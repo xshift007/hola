@@ -1,8 +1,5 @@
-// src/main/java/com/prestabanco/app/service/SolicitudService.java
 package com.prestabanco.app.service;
 
-import com.prestabanco.app.dto.SimulacionRequest;
-import com.prestabanco.app.dto.SimulacionResponse;
 import com.prestabanco.app.entity.Solicitud;
 import com.prestabanco.app.entity.Usuario;
 import com.prestabanco.app.repository.SolicitudRepository;
@@ -19,7 +16,6 @@ import java.time.Period;
 import java.util.List;
 import java.util.Optional;
 
-
 @Service
 public class SolicitudService {
 
@@ -28,29 +24,6 @@ public class SolicitudService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
-
-    public SimulacionResponse simularPrestamo(SimulacionRequest request) {
-        BigDecimal monto = request.getMontoDeseado();
-        BigDecimal tasaAnual = request.getTasaInteres();
-        Integer plazoAnios = request.getPlazo();
-        Integer plazoMeses = plazoAnios * 12;
-        BigDecimal tasaMensual = tasaAnual.divide(BigDecimal.valueOf(12 * 100), 10, RoundingMode.HALF_UP);
-
-        BigDecimal unoMasR = BigDecimal.ONE.add(tasaMensual);
-        BigDecimal potencia = unoMasR.pow(plazoMeses, MathContext.DECIMAL128);
-        BigDecimal cuotaMensual = monto.multiply(tasaMensual.multiply(potencia))
-                .divide(potencia.subtract(BigDecimal.ONE), 2, RoundingMode.HALF_UP);
-
-        BigDecimal totalPagado = cuotaMensual.multiply(BigDecimal.valueOf(plazoMeses));
-        BigDecimal totalIntereses = totalPagado.subtract(monto);
-
-        SimulacionResponse response = new SimulacionResponse();
-        response.setCuotaMensual(cuotaMensual);
-        response.setTotalPagado(totalPagado);
-        response.setTotalIntereses(totalIntereses);
-
-        return response;
-    }
 
     public Solicitud crearSolicitud(Solicitud solicitud) {
         solicitud.setFechaSolicitud(LocalDateTime.now());
@@ -152,9 +125,6 @@ public class SolicitudService {
             return "RECHAZADA";
         }
 
-        // Cálculo de Costos Totales (Agregar aquí)
-        calcularCostosTotales(solicitud);
-
         // Si pasa todas las evaluaciones
         solicitud.setEstadoSolicitud("APROBADA");
         solicitud.setFechaAprobacionRechazo(LocalDateTime.now());
@@ -178,31 +148,6 @@ public class SolicitudService {
         return deudas.divide(usuario.getIngresosMensuales(), 2, RoundingMode.HALF_UP);
     }
 
-    private void calcularCostosTotales(Solicitud solicitud) {
-        BigDecimal monto = solicitud.getMontoSolicitado();
-        Integer plazoAnios = solicitud.getPlazoSolicitado();
-        BigDecimal tasaAnual = solicitud.getTasaInteres();
 
-        // Cuota Mensual
-        BigDecimal cuotaMensual = calcularCuotaMensual(monto, plazoAnios, tasaAnual);
-        solicitud.setCuotaMensual(cuotaMensual);
 
-        // Seguros
-        BigDecimal seguroDesgravamen = monto.multiply(new BigDecimal("0.0003")).multiply(BigDecimal.valueOf(plazoAnios * 12));
-        BigDecimal seguroIncendio = new BigDecimal("20000").multiply(BigDecimal.valueOf(plazoAnios * 12));
-
-        // Comisión por Administración
-        BigDecimal comisionAdministracion = monto.multiply(new BigDecimal("0.01"));
-
-        // Costo Total Mensual
-        BigDecimal costoMensual = cuotaMensual.add(seguroDesgravamen.divide(BigDecimal.valueOf(plazoAnios * 12), 2, RoundingMode.HALF_UP))
-                                                  .add(seguroIncendio.divide(BigDecimal.valueOf(plazoAnios * 12), 2, RoundingMode.HALF_UP));
-
-        // Costo Total durante la Vida del Préstamo
-        BigDecimal costoTotal = costoMensual.multiply(BigDecimal.valueOf(plazoAnios * 12))
-                                            .add(comisionAdministracion);
-
-        solicitud.setTotalPagado(costoTotal);
-        solicitud.setTotalIntereses(costoTotal.subtract(monto));
-    }
 }
