@@ -47,10 +47,6 @@ public class SolicitudService {
         return solicitudRepository.save(solicitud);
     }
 
-    public void eliminarSolicitud(Long id) {
-        solicitudRepository.deleteById(id);
-    }
-
     public String evaluarSolicitud(Solicitud solicitud) {
         Usuario usuario = solicitud.getUsuario();
 
@@ -147,5 +143,7 @@ public class SolicitudService {
         BigDecimal deudas = usuario.getDeudasActuales() != null ? usuario.getDeudasActuales() : BigDecimal.ZERO;
         return deudas.divide(usuario.getIngresosMensuales(), 2, RoundingMode.HALF_UP);
     }
+
+
 
 }

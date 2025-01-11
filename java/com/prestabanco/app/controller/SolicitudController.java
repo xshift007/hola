@@ -9,11 +9,11 @@ import com.prestabanco.app.service.FileStorageService;
 import com.prestabanco.app.service.SolicitudService;
 import com.prestabanco.app.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.http.MediaType;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
@@ -97,17 +97,6 @@ public class SolicitudController {
             String resultado = solicitudService.evaluarSolicitud(optionalSolicitud.get());
             return "La solicitud ha sido " + resultado;
         } else {
-            throw new ResourceNotFoundException("Solicitud no encontrada");
-        }
-    }
-
-    @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void eliminarSolicitud(@PathVariable Long id) {
-        Optional<Solicitud> solicitud =  solicitudService.obtenerSolicitudPorId(id);
-        if(solicitud.isPresent()){
-            solicitudService.eliminarSolicitud(id);
-        } else{
             throw new ResourceNotFoundException("Solicitud no encontrada");
         }
     }
