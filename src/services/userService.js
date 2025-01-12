@@ -1,9 +1,22 @@
-import api from './api';
+// src/services/userService.js
+import api from './api'
 
-const registerUser = (usuario) => {
-  return api.post('/usuarios/registrar', usuario);
-};
+export const registerUser = async (userData) => {
+  const response = await api.post('/usuarios/registrar', userData)
+  return response.data
+}
 
-export default {
-  registerUser,
-};
+export const getUserById = async (id) => {
+  const response = await api.get(`/usuarios/${id}`)
+  return response.data
+}
+
+export const getUserByName = async (name) => {
+  const response = await api.get(`/usuarios/nombre/${name}`)
+  return response.data
+}
+
+export const getAllUsers = async () => {
+  const response = await api.get('/usuarios')
+  return response.data
+}

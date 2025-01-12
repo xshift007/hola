@@ -1,7 +1,9 @@
-import axios from 'axios';
+// src/services/api.js
+import axios from 'axios'
 
 const api = axios.create({
-  baseURL: '/api',
-});
+  baseURL: 'http://localhost:8080/api' // Ajustar según tu configuración
+})
 
-export default api;
+// Interceptores pueden añadirse para global error handling
+export default api

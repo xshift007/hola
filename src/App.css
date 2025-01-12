@@ -1,3 +1,4 @@
+/*
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -39,4 +40,29 @@
 
 .read-the-docs {
   color: #888;
+}
+*/
+
+/* src/App.css */
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.content-container {
+  flex: 1;
+  max-width: 1200px; /* Ancho máximo para centrar contenido */
+  margin: var(--spacing-md) auto 0 auto;
+  padding: var(--spacing-md);
+}
+
+.footer {
+  background-color: var(--secondary-color);
+  text-align: center;
+  padding: var(--spacing-sm);
+  border-top: 1px solid var(--border-color);
+  font-size: 0.9rem;
+  color: #666;
 }

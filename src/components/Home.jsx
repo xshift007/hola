@@ -1,16 +1,28 @@
 // src/components/Home.jsx
-import React from 'react';
-import { Container, Typography } from '@mui/material';
+import React from 'react'
 
-const Home = () => {
+function Home() {
   return (
-    <Container style={{ marginTop: '2rem' }}>
-      <Typography variant="h4">Bienvenido a PrestaBanco</Typography>
-      <Typography variant="body1" style={{ marginTop: '1rem' }}>
-        Tu solución para créditos hipotecarios.
-      </Typography>
-    </Container>
-  );
-};
+    <div 
+      style={{
+        backgroundColor: '#fff',
+        padding: '2rem',
+        borderRadius: '4px',
+        border: '1px solid var(--border-color)'
+      }}
+    >
+      <h1 style={{ marginBottom: '1rem' }}>Bienvenido a PrestaBanco</h1>
+      <p style={{ marginBottom: '1rem' }}>
+        Simplificamos la gestión de tus solicitudes de crédito hipotecario. 
+        Regístrate, aplica a un préstamo, evalúa solicitudes y simula montos, 
+        todo en un solo lugar.
+      </p>
+      <p>
+        Navega a través de nuestro menú superior para descubrir todas las funcionalidades 
+        disponibles y aprovechar nuestros servicios.
+      </p>
+    </div>
+  )
+}
 
-export default Home;
+export default Home

@@ -1,38 +1,40 @@
-import api from './api';
+// src/services/loanService.js
+import api from './api'
 
-// Simular préstamo (P1)
-const simulateLoan = (data) => {
-  return api.post('/solicitudes/simular', data);
-};
+// Crear solicitud con archivos
+export const createLoanApplication = async (formData) => {
+  const response = await api.post('/solicitudes/crear-con-usuario', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  })
+  return response.data
+}
 
-// Crear solicitud de crédito (P3)
-const createLoanApplication = (formData) => {
-  return api.post('/solicitudes/crear-con-usuario', formData, { // Ajustado a /solicitudes/crear-con-usuario
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
-};
+export const getAllLoans = async () => {
+  const response = await api.get('/solicitudes')
+  return response.data
+}
 
-// Obtener todas las solicitudes (P4 - para evaluación)
-const getAllSolicitudes = () => {
-  return api.get('/solicitudes'); // Ajustado a /solicitudes
-};
+export const getLoanById = async (id) => {
+  const response = await api.get(`/solicitudes/${id}`)
+  return response.data
+}
 
-// Evaluar una solicitud (P4 - para evaluación)
-const evaluateLoan = (idSolicitud) => {
-  return api.put(`/solicitudes/${idSolicitud}/evaluar`);
-};
+export const getLoansByUserName = async (userName) => {
+  const response = await api.get(`/solicitudes/usuario/nombre/${userName}`)
+  return response.data
+}
 
-// Obtener solicitudes por nombre de usuario (P5 - para seguimiento)
-const getSolicitudesByUser = (nombreCompleto) => {
-  return api.get(`/solicitudes/usuario/nombre/${nombreCompleto}`); // Ajustado a /solicitudes/usuario/nombre/{nombreCompleto}
-};
+export const evaluateLoan = async (id) => {
+  const response = await api.put(`/solicitudes/${id}/evaluar`)
+  return response.data 
+}
 
-export default {
-  simulateLoan,
-  createLoanApplication,
-  getAllSolicitudes,
-  evaluateLoan,
-  getSolicitudesByUser,
-};
+export const changeLoanStatus = async (id, newStatus) => {
+  const response = await api.put(`/solicitudes/${id}/cambiar-estado?nuevoEstado=${newStatus}`)
+  return response.data
+}
+
+export const simulateLoan = async (simulationData) => {
+  const response = await api.post('/solicitudes/simular', simulationData)
+  return response.data
+}

@@ -1,120 +1,137 @@
 // src/components/Simulation.jsx
-import React, { useState } from 'react';
-import { Container, TextField, Button, Typography, MenuItem } from '@mui/material';
-import loanService from '../services/loanService';
+import React, { useState } from 'react'
+import { simulateLoan } from '../services/loanService'
+import '../styles/styles.css'
 
-const Simulation = () => {
-  const [datos, setDatos] = useState({
+function Simulation() {
+  const [simData, setSimData] = useState({
     montoDeseado: '',
     plazo: '',
     tasaInteres: '',
-    tipoPrestamo: 'HIPOTECARIO', // Valor por defecto
-  });
-
-  const [resultado, setResultado] = useState(null);
+    tipoPrestamo: 'PRIMERA VIVIENDA',
+    seguros: '',
+    comisiones: ''
+  })
+  const [result, setResult] = useState(null)
+  const [error, setError] = useState('')
+  const [message, setMessage] = useState('')
 
   const handleChange = (e) => {
-    setDatos({ ...datos, [e.target.name]: e.target.value });
-  };
+    setSimData({
+      ...simData,
+      [e.target.name]: e.target.value
+    })
+  }
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    // Validar que todos los campos estén llenos
-    if (!datos.montoDeseado || !datos.plazo || !datos.tasaInteres || !datos.tipoPrestamo) {
-      alert('Por favor, completa todos los campos requeridos.');
-      return;
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (!simData.montoDeseado || !simData.plazo || !simData.tasaInteres) {
+      setError('Por favor llena los campos obligatorios.')
+      setMessage('')
+      return
     }
-
-    const simulationData = {
-      montoDeseado: parseFloat(datos.montoDeseado),
-      plazo: parseInt(datos.plazo, 10),
-      tasaInteres: parseFloat(datos.tasaInteres),
-      tipoPrestamo: datos.tipoPrestamo,
-    };
-
-    loanService
-      .simulateLoan(simulationData)
-      .then((response) => {
-        setResultado(response.data);
+    try {
+      const response = await simulateLoan({
+        montoDeseado: parseFloat(simData.montoDeseado),
+        plazo: parseInt(simData.plazo),
+        tasaInteres: parseFloat(simData.tasaInteres),
+        tipoPrestamo: simData.tipoPrestamo,
+        seguros: parseFloat(simData.seguros) || 0,
+        comisiones: parseFloat(simData.comisiones) || 0
       })
-      .catch((error) => {
-        if (error.response && error.response.data) {
-          // Mostrar mensajes de error específicos del back-end
-          const errorMessages = Object.values(error.response.data).join('\n');
-          alert(`Error al simular el crédito:\n${errorMessages}`);
-        } else {
-          console.error(error);
-          alert('Error al simular el crédito');
-        }
-      });
-  };
+      setResult(response)
+      setError('')
+      setMessage('Simulación exitosa.')
+    } catch (err) {
+      setError('Ocurrió un error en la simulación.')
+      setMessage('')
+      setResult(null)
+    }
+  }
 
   return (
-    <Container style={{ marginTop: '2rem' }}>
-      <Typography variant="h5">Simulación de Crédito Hipotecario</Typography>
+    <div className="form-section">
+      <h2>Simulación de Préstamo</h2>
       <form onSubmit={handleSubmit}>
-        <TextField
-          name="montoDeseado"
-          label="Monto Solicitado"
-          fullWidth
-          margin="normal"
-          value={datos.montoDeseado}
+        <label>Monto Deseado *</label>
+        <input 
+          type="number" 
+          name="montoDeseado" 
+          value={simData.montoDeseado} 
           onChange={handleChange}
-          required
-          type="number"
-          inputProps={{ min: "0", step: "0.01" }}
         />
-        <TextField
-          name="plazo"
-          label="Plazo Solicitado (años)"
-          fullWidth
-          margin="normal"
-          value={datos.plazo}
+
+        <label>Plazo (años) *</label>
+        <input 
+          type="number" 
+          name="plazo" 
+          value={simData.plazo} 
           onChange={handleChange}
-          required
-          type="number"
-          inputProps={{ min: "1", max: "30", step: "1" }}
         />
-        <TextField
-          name="tasaInteres"
-          label="Tasa de Interés (%)"
-          fullWidth
-          margin="normal"
-          value={datos.tasaInteres}
+
+        <label>Tasa de Interés (%) *</label>
+        <input 
+          type="number" 
+          name="tasaInteres" 
+          value={simData.tasaInteres} 
           onChange={handleChange}
-          required
-          type="number"
-          inputProps={{ min: "0", step: "0.01" }}
         />
-        <TextField
-          name="tipoPrestamo"
-          label="Tipo de Préstamo"
-          select
-          fullWidth
-          margin="normal"
-          value={datos.tipoPrestamo}
+
+        <label>Tipo de Préstamo</label>
+        <select 
+          name="tipoPrestamo" 
+          value={simData.tipoPrestamo} 
           onChange={handleChange}
-          required
         >
-          <MenuItem value="HIPOTECARIO">Hipotecario</MenuItem>
-          <MenuItem value="PERSONAL">Personal</MenuItem>
-          {/* Añade más opciones si es necesario */}
-        </TextField>
-        <Button type="submit" variant="contained" color="primary">
+          <option value="PRIMERA VIVIENDA">Primera Vivienda</option>
+          <option value="SEGUNDA VIVIENDA">Segunda Vivienda</option>
+          <option value="PROPIEDADES COMERCIALES">Propiedades Comerciales</option>
+          <option value="REMODELACIÓN">Remodelación</option>
+        </select>
+
+        <label>Costos de Seguros (opcional)</label>
+        <input 
+          type="number" 
+          name="seguros" 
+          value={simData.seguros} 
+          onChange={handleChange}
+        />
+
+        <label>Comisiones (opcional)</label>
+        <input 
+          type="number" 
+          name="comisiones" 
+          value={simData.comisiones} 
+          onChange={handleChange}
+        />
+
+        <button type="submit" className="btn-primary">
           Simular
-        </Button>
+        </button>
       </form>
-      {resultado && (
-        <div style={{ marginTop: '2rem' }}>
-          <Typography variant="h6">Resultados de la Simulación:</Typography>
-          <Typography>Cuota Mensual: {resultado.cuotaMensual}</Typography>
-          <Typography>Costo Total: {resultado.totalPagado}</Typography>
-          <Typography>Total de Intereses: {resultado.totalIntereses}</Typography>
+
+      {message && <p className="success-message">{message}</p>}
+      {error && <p className="error-message">{error}</p>}
+
+      {result && (
+        <div 
+          style={{
+            marginTop: '1rem',
+            backgroundColor: '#fff',
+            border: '1px solid var(--border-color)',
+            borderRadius: '4px',
+            padding: '1rem'
+          }}
+        >
+          <p><strong>Cuota Mensual:</strong> {result.cuotaMensual}</p>
+          <p><strong>Total Pagado:</strong> {result.totalPagado}</p>
+          <p><strong>Total Intereses:</strong> {result.totalIntereses}</p>
+          <p><strong>Costos Adicionales:</strong> {result.costosAdicionales}</p>
+          <p><strong>Total Final:</strong> {result.totalFinal}</p>
         </div>
       )}
-    </Container>
-  );
-};
+    </div>
+  )
+}
 
-export default Simulation;
+export default Simulation

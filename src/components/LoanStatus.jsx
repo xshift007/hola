@@ -1,109 +1,90 @@
 // src/components/LoanStatus.jsx
-import React, { useState } from 'react';
-import {
-  Container,
-  Typography,
-  TextField,
-  Button,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  Alert,
-  CircularProgress,
-} from '@mui/material';
-import loanService from '../services/loanService';
-import dayjs from 'dayjs';
+import React, { useState, useEffect } from 'react'
+import { getAllLoans, changeLoanStatus } from '../services/loanService'
+import '../styles/styles.css'
 
-const LoanStatus = () => {
-  const [nombreCompleto, setNombreCompleto] = useState('');
-  const [solicitudes, setSolicitudes] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+function LoanStatus() {
+  const [loans, setLoans] = useState([])
+  const [message, setMessage] = useState('')
+  const [error, setError] = useState('')
+  const [newStatus, setNewStatus] = useState('')
 
-  const handleChange = (e) => {
-    setNombreCompleto(e.target.value);
-  };
+  useEffect(() => {
+    fetchLoans()
+  }, [])
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-    setSolicitudes([]);
+  const fetchLoans = async () => {
+    try {
+      const data = await getAllLoans()
+      setLoans(data)
+    } catch (err) {
+      setError('Error al obtener la lista de solicitudes.')
+    }
+  }
 
-    loanService
-      .getSolicitudesByUser(nombreCompleto)
-      .then((response) => {
-        setSolicitudes(response.data);
-      })
-      .catch((error) => {
-        console.error(error);
-        setError('Error al obtener las solicitudes');
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  };
+  const handleChangeStatus = async (id) => {
+    if (!newStatus) {
+      setError('Por favor ingresa el nuevo estado.')
+      return
+    }
+    try {
+      const updatedLoan = await changeLoanStatus(id, newStatus)
+      setMessage(`Estado actualizado a: ${updatedLoan.estadoSolicitud}`)
+      setError('')
+      fetchLoans()
+    } catch (err) {
+      setError('Error al cambiar el estado de la solicitud.')
+      setMessage('')
+    }
+  }
 
   return (
-    <Container style={{ marginTop: '2rem' }}>
-      <Typography variant="h5">Estado de sus Solicitudes</Typography>
-      <form onSubmit={handleSubmit}>
-        <TextField
-          name="nombreCompleto"
-          label="Nombre Completo"
-          fullWidth
-          margin="normal"
-          value={nombreCompleto}
-          onChange={handleChange}
-          required
-        />
-        <Button type="submit" variant="contained" color="primary" disabled={loading}>
-          {loading ? <CircularProgress size={24} color="inherit" /> : 'Ver Solicitudes'}
-        </Button>
-      </form>
-      {error && (
-        <Alert severity="error" style={{ marginTop: '1rem' }}>
-          {error}
-        </Alert>
-      )}
-      {solicitudes.length > 0 && (
-        <Table style={{ marginTop: '2rem' }}>
-          <TableHead>
-            <TableRow>
-              <TableCell>ID Solicitud</TableCell>
-              <TableCell>Fecha</TableCell>
-              <TableCell>Monto</TableCell>
-              <TableCell>Plazo</TableCell>
-              <TableCell>Estado</TableCell>
-              <TableCell>Comentarios</TableCell>
-              <TableCell>Fecha de Aprobación/Rechazo</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {solicitudes.map((solicitud) => (
-              <TableRow key={solicitud.idSolicitud}>
-                <TableCell>{solicitud.idSolicitud}</TableCell>
-                <TableCell>
-                  {dayjs(solicitud.fechaSolicitud).format('DD/MM/YYYY')}
-                </TableCell>
-                <TableCell>{solicitud.montoSolicitado}</TableCell>
-                <TableCell>{solicitud.plazoSolicitado}</TableCell>
-                <TableCell>{solicitud.estadoSolicitud}</TableCell>
-                <TableCell>{solicitud.comentariosSeguimiento}</TableCell>
-                <TableCell>
-                  {solicitud.fechaAprobacionRechazo
-                    ? dayjs(solicitud.fechaAprobacionRechazo).format('DD/MM/YYYY')
-                    : 'N/A'}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      )}
-    </Container>
-  );
-};
+    <div>
+      <h2>Estado de Solicitudes</h2>
+      {message && <p className="success-message">{message}</p>}
+      {error && <p className="error-message">{error}</p>}
 
-export default LoanStatus;
+      <div className="form-section" style={{ marginBottom: '1.5rem' }}>
+        <label>Nuevo Estado (ej: E2_PENDIENTE_DOCUMENTACION)</label>
+        <input 
+          type="text"
+          placeholder="E2_PENDIENTE_DOCUMENTACION"
+          value={newStatus}
+          onChange={(e) => setNewStatus(e.target.value)}
+        />
+      </div>
+
+      <div className="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Tipo Préstamo</th>
+              <th>Estado Actual</th>
+              <th>Cambiar Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {loans.map((loan) => (
+              <tr key={loan.idSolicitud}>
+                <td>{loan.idSolicitud}</td>
+                <td>{loan.tipoPrestamo}</td>
+                <td>{loan.estadoSolicitud}</td>
+                <td>
+                  <button 
+                    onClick={() => handleChangeStatus(loan.idSolicitud)} 
+                    className="btn-primary"
+                  >
+                    Actualizar
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )
+}
+
+export default LoanStatus
