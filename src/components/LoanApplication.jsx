@@ -231,36 +231,32 @@ function LoanApplication() {
         />
 
         {/* Reorganizar botones */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem' }}>
-          {/* Botón Volver a Inicio */}
-          <button
-            type="button"
-            className="btn-primary"
-            style={{ backgroundColor: '#17a2b8', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
-            onClick={handleGoHome}
-          >
-            <FaArrowLeft /> Volver a Inicio
-          </button>
+        <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                  
+                  <button
+                    type="button"
+                    className="btn-primary"
+                    style={{ backgroundColor: '#17a2b8', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                    onClick={handleGoHome}
+                  >
+                    <FaArrowLeft /> Volver a Inicio
+                  </button>
 
-          {/* Botón Limpiar */}
-          <button
-            type="button"
-            className="btn-primary"
-            style={{ backgroundColor: '#6c757d', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
-            onClick={handleClear}
-          >
-            <FaBroom /> Limpiar
-          </button>
 
-          {/* Botón Crear Solicitud (sin icono de papelera) */}
-          <button
-            type="submit"
-            className="btn-primary"
-            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
-          >
-            Crear Solicitud
-          </button>
-        </div>
+                  <button
+                    type="button"
+                    className="btn-primary"
+                    style={{ backgroundColor: '#6c757d', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                    onClick={handleClear}
+                  >
+                    <FaBroom /> Limpiar
+                  </button>
+                  
+
+                  <button type="submit" className="btn-primary">
+                    Registrar
+                  </button>
+                </div>
       </form>
 
       {message && !showModal && <p className="success-message">{message}</p>}

@@ -372,9 +372,16 @@ function UserRegistration() {
         {/* No solicitamos comprobanteIngresos aquí porque se maneja en la Solicitud, si se desea. */}
         
         <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-          <button type="submit" className="btn-primary">
-            Registrar
+          <button
+            type="button"
+            className="btn-primary"
+            style={{ backgroundColor: '#17a2b8', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+            onClick={handleGoHome}
+          >
+            <FaArrowLeft /> Volver a Inicio
           </button>
+
+
           <button
             type="button"
             className="btn-primary"
@@ -383,13 +390,10 @@ function UserRegistration() {
           >
             <FaBroom /> Limpiar
           </button>
-          <button
-            type="button"
-            className="btn-primary"
-            style={{ backgroundColor: '#17a2b8', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
-            onClick={handleGoHome}
-          >
-            <FaArrowLeft /> Volver a Inicio
+          
+
+          <button type="submit" className="btn-primary">
+            Registrar
           </button>
         </div>
       </form>
