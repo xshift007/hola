@@ -2,6 +2,7 @@
 import React, { useState } from 'react'
 import { registerUser } from '../services/userService'
 import { useNavigate } from 'react-router-dom'
+import { FaArrowLeft, FaBroom, FaTrash } from 'react-icons/fa' // Importamos los iconos necesarios
 import '../styles/styles.css'
 
 function UserRegistration() {
@@ -36,7 +37,7 @@ function UserRegistration() {
   // Funciones de Validación/Utilidad
   // ─────────────────────────────────────────────────────────────────
 
-  // Valida que sea mayor de 18 años
+  // Valida que sea mayor de edad
   const esMayorDeEdad = (fechaString) => {
     if (!fechaString) return false
     const hoy = new Date()
@@ -58,8 +59,7 @@ function UserRegistration() {
     return '$ ' + number.toLocaleString('es-CL') 
   }
 
-  // Podríamos formatear el número de teléfono con el prefijo +56 9
-  // y validar que luego del +56 9 vengan 8 dígitos.
+  // Validar teléfono +56 9 ########
   const validarTelefono = (valor) => {
     // Aceptamos solamente si comienza con +56 9
     // y luego 8 dígitos. Ej: +56 9 12345678
@@ -378,18 +378,18 @@ function UserRegistration() {
           <button
             type="button"
             className="btn-primary"
-            style={{ backgroundColor: '#6c757d' }}
+            style={{ backgroundColor: '#6c757d', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
             onClick={handleClear}
           >
-            Limpiar
+            <FaBroom /> Limpiar
           </button>
           <button
             type="button"
             className="btn-primary"
-            style={{ backgroundColor: '#17a2b8' }}
+            style={{ backgroundColor: '#17a2b8', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
             onClick={handleGoHome}
           >
-            Volver a Inicio
+            <FaArrowLeft /> Volver a Inicio
           </button>
         </div>
       </form>
@@ -421,16 +421,17 @@ function UserRegistration() {
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1rem' }}>
               <button
                 className="btn-primary"
-                style={{ backgroundColor: '#6c757d' }}
+                style={{ backgroundColor: '#6c757d', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
                 onClick={handleStayHere}
               >
-                Permanecer
+                Permanecer <FaArrowLeft />
               </button>
               <button
                 className="btn-primary"
                 onClick={handleGoToLoanApplication}
+                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
               >
-                Ir a Aplicar Préstamo
+                Ir a Aplicar Préstamo <FaArrowLeft />
               </button>
             </div>
           </div>

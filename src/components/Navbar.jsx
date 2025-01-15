@@ -1,6 +1,7 @@
 // src/components/Navbar.jsx
 import React from 'react'
 import { NavLink } from 'react-router-dom'
+import { FaHome, FaUserPlus, FaMoneyCheckAlt, FaClipboardList, FaClipboardCheck, FaQuestionCircle, FaCalculator } from 'react-icons/fa' // Importamos iconos para cada enlace
 import '../styles/styles.css'
 import '../App.css'
 
@@ -28,64 +29,65 @@ function Navbar() {
           <NavLink
             to="/"
             className={({ isActive }) => (isActive ? 'active-link' : '')}
-            style={{ color: '#fff', textDecoration: 'none', fontWeight: '500' }}
+            style={{ color: '#fff', textDecoration: 'none', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
             end
           >
-            PrestaBanco
+            {/* Icono de React o de tu preferencia */}
+            <FaHome /> PrestaBanco
           </NavLink>
         </div>
         <div style={{ display: 'flex', gap: '1.5rem' }}>
           <NavLink 
             to="/" 
             className={({ isActive }) => (isActive ? 'active-link' : '')}
-            style={{ color: '#fff', textDecoration: 'none', fontWeight: '500' }}
+            style={{ color: '#fff', textDecoration: 'none', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
             end
           >
-            Inicio
+            <FaHome /> Inicio
           </NavLink>
           <NavLink 
             to="/register"
             className={({ isActive }) => (isActive ? 'active-link' : '')}
-            style={{ color: '#fff', textDecoration: 'none', fontWeight: '500' }}
+            style={{ color: '#fff', textDecoration: 'none', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
           >
-            Registro
+            <FaUserPlus /> Registro
           </NavLink>
           <NavLink 
             to="/loan-application"
             className={({ isActive }) => (isActive ? 'active-link' : '')}
-            style={{ color: '#fff', textDecoration: 'none', fontWeight: '500' }}
+            style={{ color: '#fff', textDecoration: 'none', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
           >
-            Aplicar Préstamo
+            <FaMoneyCheckAlt /> Aplicar Préstamo
           </NavLink>
           <NavLink 
             to="/loan-evaluation"
             className={({ isActive }) => (isActive ? 'active-link' : '')}
-            style={{ color: '#fff', textDecoration: 'none', fontWeight: '500' }}
+            style={{ color: '#fff', textDecoration: 'none', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
           >
-            Evaluar Solicitudes
+            <FaClipboardList /> Evaluar Solicitudes
           </NavLink>
           <NavLink 
             to="/loan-status"
             className={({ isActive }) => (isActive ? 'active-link' : '')}
-            style={{ color: '#fff', textDecoration: 'none', fontWeight: '500' }}
+            style={{ color: '#fff', textDecoration: 'none', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
           >
-            Estado Solicitudes
+            <FaClipboardCheck /> Estado Solicitudes
           </NavLink>
           <NavLink 
             to="/simulation"
             className={({ isActive }) => (isActive ? 'active-link' : '')}
-            style={{ color: '#fff', textDecoration: 'none', fontWeight: '500' }}
+            style={{ color: '#fff', textDecoration: 'none', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
           >
-            Simulación
+            <FaCalculator /> Simulación
           </NavLink>
           
           {/* Nuevo link a la vista Q&A */}
           <NavLink 
             to="/qa"
             className={({ isActive }) => (isActive ? 'active-link' : '')}
-            style={{ color: '#fff', textDecoration: 'none', fontWeight: '500' }}
+            style={{ color: '#fff', textDecoration: 'none', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
           >
-            Q&A
+            <FaQuestionCircle /> Q&A
           </NavLink>
         </div>
       </div>

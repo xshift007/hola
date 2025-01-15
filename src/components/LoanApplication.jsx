@@ -2,6 +2,7 @@
 import React, { useState } from 'react'
 import { createLoanApplication } from '../services/loanService'
 import { useNavigate } from 'react-router-dom'
+import { FaTrash, FaArrowLeft, FaBroom } from 'react-icons/fa' // Importamos los iconos necesarios
 import '../styles/styles.css'
 
 function LoanApplication() {
@@ -45,7 +46,7 @@ function LoanApplication() {
   const [error, setError] = useState('')
   const [showModal, setShowModal] = useState(false)
 
-  // Función para formatear dinero (similar a la de UserRegistration)
+  // Función para formatear dinero
   const formatMoney = (value) => {
     if (!value) return ''
     let numeric = value.replace(/\D/g, '')
@@ -230,24 +231,24 @@ function LoanApplication() {
         />
 
         <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-          <button type="submit" className="btn-primary">
-            Crear Solicitud
+          <button type="submit" className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <FaTrash /> Crear Solicitud
           </button>
           <button
             type="button"
             className="btn-primary"
-            style={{ backgroundColor: '#6c757d' }}
+            style={{ backgroundColor: '#6c757d', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
             onClick={handleClear}
           >
-            Limpiar
+            <FaBroom /> Limpiar
           </button>
           <button
             type="button"
             className="btn-primary"
-            style={{ backgroundColor: '#17a2b8' }}
+            style={{ backgroundColor: '#17a2b8', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
             onClick={handleGoHome}
           >
-            Volver a Inicio
+            <FaArrowLeft /> Volver a Inicio
           </button>
         </div>
       </form>
@@ -278,16 +279,17 @@ function LoanApplication() {
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1rem' }}>
               <button
                 className="btn-primary"
-                style={{ backgroundColor: '#6c757d' }}
+                style={{ backgroundColor: '#6c757d', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
                 onClick={handleStayHere}
               >
-                Permanecer
+                <FaArrowLeft /> Permanecer
               </button>
               <button
                 className="btn-primary"
                 onClick={handleGoToLoanStatus}
+                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
               >
-                Ir a Estado de Solicitudes
+                Ir a Estado de Solicitudes <FaArrowLeft />
               </button>
             </div>
           </div>

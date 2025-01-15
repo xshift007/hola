@@ -16,6 +16,15 @@
   background-color: #0052a1;
 }
 
+/* src/styles/styles.css */
+
+/* Ajustar el tamaño de los iconos en los botones */
+.btn-primary svg {
+  width: 1em;
+  height: 1em;
+}
+
+
 /* Sección de formulario (fondo blanco, borde gris) */
 .form-section {
   background-color: #fff;

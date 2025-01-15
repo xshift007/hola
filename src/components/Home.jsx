@@ -1,6 +1,7 @@
 // src/components/Home.jsx
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
+import { FaArrowLeft } from 'react-icons/fa' // Importamos el icono de flecha atrás
 
 function Home() {
   const navigate = useNavigate()
@@ -25,7 +26,7 @@ function Home() {
         disponibles y aprovechar nuestros servicios.
       </p>
 
-      {/* Botón Volver (opcional en Home, pero lo dejamos de ejemplo) */}
+      {/* Botón Volver con icono */}
       <button
         onClick={() => navigate(-1)}
         style={{
@@ -35,10 +36,13 @@ function Home() {
           border: 'none',
           borderRadius: '4px',
           cursor: 'pointer',
-          marginTop: '1rem'
+          marginTop: '1rem',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem'
         }}
       >
-        Volver
+        <FaArrowLeft /> Volver
       </button>
     </div>
   )

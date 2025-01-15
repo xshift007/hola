@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getAllLoans, getLoansByUserName, deleteLoan } from '../services/loanService'
+import { FaTrash, FaArrowLeft, FaBroom } from 'react-icons/fa' // Importamos los iconos necesarios
 import '../styles/styles.css'
 
 function LoanStatus() {
@@ -152,14 +153,14 @@ function LoanStatus() {
             className="btn-primary"
             style={{ backgroundColor: '#6c757d' }}
           >
-            Limpiar
+            <FaBroom /> Limpiar
           </button>
           <button
             className="btn-primary"
-            style={{ backgroundColor: '#17a2b8' }}
+            style={{ backgroundColor: '#17a2b8', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
             onClick={handleGoHome}
           >
-            Volver a Inicio
+            <FaArrowLeft /> Volver a Inicio
           </button>
         </div>
       </div>
@@ -194,10 +195,10 @@ function LoanStatus() {
                 <td>
                   <button
                     className="btn-primary"
-                    style={{ backgroundColor: '#dc3545' }}
+                    style={{ backgroundColor: '#dc3545', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
                     onClick={() => handleShowDeleteModal(loan)}
                   >
-                    Eliminar
+                    <FaTrash /> Eliminar
                   </button>
                 </td>
               </tr>
@@ -252,16 +253,16 @@ function LoanStatus() {
               <button
                 onClick={handleCloseDeleteModal}
                 className="btn-primary"
-                style={{ backgroundColor: '#6c757d' }}
+                style={{ backgroundColor: '#6c757d', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
               >
-                Cancelar
+                <FaArrowLeft /> Cancelar
               </button>
               <button
                 onClick={handleConfirmDelete}
                 className="btn-primary"
-                style={{ backgroundColor: '#dc3545' }}
+                style={{ backgroundColor: '#dc3545', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
               >
-                Eliminar
+                <FaTrash /> Eliminar
               </button>
             </div>
           </div>

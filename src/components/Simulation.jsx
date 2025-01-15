@@ -2,6 +2,7 @@
 import React, { useState } from 'react'
 import { simulateLoan } from '../services/loanService'
 import { useNavigate } from 'react-router-dom'
+import { FaArrowLeft, FaBroom } from 'react-icons/fa' // Importamos los iconos necesarios
 import '../styles/styles.css'
 
 function Simulation() {
@@ -164,18 +165,18 @@ function Simulation() {
           <button
             type="button"
             className="btn-primary"
-            style={{ backgroundColor: '#6c757d' }}
+            style={{ backgroundColor: '#6c757d', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
             onClick={handleClear}
           >
-            Limpiar
+            <FaBroom /> Limpiar
           </button>
           <button
             type="button"
             className="btn-primary"
-            style={{ backgroundColor: '#17a2b8' }}
+            style={{ backgroundColor: '#17a2b8', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
             onClick={handleGoHome}
           >
-            Volver a Inicio
+            <FaArrowLeft /> Volver a Inicio
           </button>
         </div>
       </form>
