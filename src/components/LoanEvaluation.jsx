@@ -156,10 +156,6 @@ function LoanEvaluation() {
           placeholder="1234"
         />
         <div style={{ marginTop: '1rem' }}>
-          <button onClick={handleLogin} className="btn-primary">
-            Ingresar
-          </button>
-          {' '}
           <button 
             className="btn-primary" 
             style={{ backgroundColor: '#17a2b8', marginLeft: '1rem' }}
@@ -167,6 +163,11 @@ function LoanEvaluation() {
           >
             Volver a Inicio
           </button>
+          {' '}
+          <button onClick={handleLogin} className="btn-primary">
+            Ingresar
+          </button>
+          
         </div>
       </div>
     )

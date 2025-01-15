@@ -1,7 +1,7 @@
 // src/components/Home.jsx
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import { FaArrowLeft } from 'react-icons/fa' // Importamos el icono de flecha atrás
+import { FaCalculator, FaUserPlus } from 'react-icons/fa' // Importamos iconos para Simular y Registrarse
 
 function Home() {
   const navigate = useNavigate()
@@ -12,7 +12,8 @@ function Home() {
         backgroundColor: '#fff',
         padding: '2rem',
         borderRadius: '4px',
-        border: '1px solid var(--border-color)'
+        border: '1px solid var(--border-color)',
+        textAlign: 'center'
       }}
     >
       <h1 style={{ marginBottom: '1rem' }}>Bienvenido a PrestaBanco</h1>
@@ -26,24 +27,45 @@ function Home() {
         disponibles y aprovechar nuestros servicios.
       </p>
 
-      {/* Botón Volver con icono */}
-      <button
-        onClick={() => navigate(-1)}
-        style={{
-          backgroundColor: 'var(--primary-color)',
-          color: '#fff',
-          padding: '0.5rem 1rem',
-          border: 'none',
-          borderRadius: '4px',
-          cursor: 'pointer',
-          marginTop: '1rem',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.5rem'
-        }}
-      >
-        <FaArrowLeft /> Volver
-      </button>
+      {/* Botones para Simular y Registrarse */}
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '2rem' }}>
+        <button
+          onClick={() => navigate('/simulation')}
+          style={{
+            backgroundColor: 'var(--primary-color)',
+            color: '#fff',
+            padding: '0.75rem 1.5rem',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            fontSize: '1rem'
+          }}
+          className="btn-primary"
+        >
+          <FaCalculator /> Simular
+        </button>
+        <button
+          onClick={() => navigate('/register')}
+          style={{
+            backgroundColor: 'var(--primary-color)',
+            color: '#fff',
+            padding: '0.75rem 1.5rem',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            fontSize: '1rem'
+          }}
+          className="btn-primary"
+        >
+          <FaUserPlus /> Registrarse
+        </button>
+      </div>
     </div>
   )
 }

@@ -33,7 +33,7 @@ function Navbar() {
             end
           >
             {/* Icono de React o de tu preferencia */}
-            <FaHome /> PrestaBanco
+             PrestaBanco
           </NavLink>
         </div>
         <div style={{ display: 'flex', gap: '1.5rem' }}>

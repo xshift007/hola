@@ -145,9 +145,14 @@ function LoanStatus() {
           onChange={(e) => setSearchName(e.target.value)}
         />
         <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
-          <button onClick={handleSearchByName} className="btn-primary">
-            Buscar
+          <button
+            className="btn-primary"
+            style={{ backgroundColor: '#17a2b8', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+            onClick={handleGoHome}
+          >
+            <FaArrowLeft /> Volver a Inicio
           </button>
+
           <button
             onClick={handleClearSearch}
             className="btn-primary"
@@ -155,12 +160,9 @@ function LoanStatus() {
           >
             <FaBroom /> Limpiar
           </button>
-          <button
-            className="btn-primary"
-            style={{ backgroundColor: '#17a2b8', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
-            onClick={handleGoHome}
-          >
-            <FaArrowLeft /> Volver a Inicio
+          
+          <button onClick={handleSearchByName} className="btn-primary">
+            Buscar
           </button>
         </div>
       </div>
