@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom'
 import '../styles/styles.css'
 
 function LoanApplication() {
+  const navigate = useNavigate()
+
   const loanHints = {
     "PRIMERA VIVIENDA": {
       plazoMax: 30,
@@ -31,7 +33,7 @@ function LoanApplication() {
   const [formData, setFormData] = useState({
     tipoPrestamo: 'PRIMERA VIVIENDA',
     montoSolicitado: '',
-    plazoSolicitado: '', 
+    plazoSolicitado: '',
     tasaInteres: '',
     valorPropiedad: '',
     nombreCompleto: ''
@@ -43,18 +45,34 @@ function LoanApplication() {
   const [error, setError] = useState('')
   const [showModal, setShowModal] = useState(false)
 
-  const navigate = useNavigate()
+  // Función para formatear dinero (similar a la de UserRegistration)
+  const formatMoney = (value) => {
+    if (!value) return ''
+    let numeric = value.replace(/\D/g, '')
+    if (!numeric) return ''
+    let number = parseInt(numeric, 10)
+    return '$ ' + number.toLocaleString('es-CL')
+  }
 
-  // Manejar cambios en el formulario
+  // Manejo de cambios para montos
+  const handleMoneyChange = (name, e) => {
+    let sinFormatear = e.target.value.replace(/\D/g, '')
+    setFormData({
+      ...formData,
+      [name]: sinFormatear
+    })
+  }
+
   const handleChange = (e) => {
     const { name, value } = e.target
     setFormData({
       ...formData,
       [name]: value
     })
+    setError('')
   }
 
-  // Botón "Limpiar" 
+  // Botón "Limpiar"
   const handleClear = () => {
     setFormData({
       tipoPrestamo: 'PRIMERA VIVIENDA',
@@ -76,22 +94,29 @@ function LoanApplication() {
     navigate('/')
   }
 
-  // Al enviar el formulario
   const handleSubmit = async (e) => {
     e.preventDefault()
+
     const confirmed = window.confirm('¿Deseas crear esta solicitud de préstamo?')
     if (!confirmed) return
 
     try {
+      // Convertir los campos monetarios a int / string
+      let payload = {
+        ...formData,
+        montoSolicitado: formData.montoSolicitado ? parseInt(formData.montoSolicitado, 10) : 0,
+        valorPropiedad: formData.valorPropiedad ? parseInt(formData.valorPropiedad, 10) : 0
+      }
+
       const multipartFormData = new FormData()
-      multipartFormData.append('tipoPrestamo', formData.tipoPrestamo)
-      multipartFormData.append('montoSolicitado', formData.montoSolicitado)
-      multipartFormData.append('plazoSolicitado', formData.plazoSolicitado)
-      multipartFormData.append('tasaInteres', formData.tasaInteres)
-      multipartFormData.append('valorPropiedad', formData.valorPropiedad)
+      multipartFormData.append('tipoPrestamo', payload.tipoPrestamo)
+      multipartFormData.append('montoSolicitado', payload.montoSolicitado)
+      multipartFormData.append('plazoSolicitado', payload.plazoSolicitado)
+      multipartFormData.append('tasaInteres', payload.tasaInteres)
+      multipartFormData.append('valorPropiedad', payload.valorPropiedad)
       multipartFormData.append('comprobanteAvaluo', avaluoFile)
       multipartFormData.append('comprobanteIngresos', ingresosFile)
-      multipartFormData.append('nombreCompleto', formData.nombreCompleto)
+      multipartFormData.append('nombreCompleto', payload.nombreCompleto)
 
       await createLoanApplication(multipartFormData)
       setMessage('Solicitud de préstamo creada con éxito.')
@@ -101,15 +126,6 @@ function LoanApplication() {
       setError('Error al crear la solicitud de préstamo.')
       setMessage('')
     }
-  }
-
-  // Cerrar modal
-  const handleGoToLoanStatus = () => {
-    setShowModal(false)
-    navigate('/loan-status')
-  }
-  const handleStayHere = () => {
-    setShowModal(false)
   }
 
   // Extraer "hint" según el tipo de préstamo seleccionado
@@ -143,18 +159,19 @@ function LoanApplication() {
               fontSize: '0.9rem'
             }}
           >
-            <strong>Referencia:</strong> Plazo Máx: {selectedHint.plazoMax} años, 
-            Tasa Recomendada: {selectedHint.tasaRange}, 
+            <strong>Referencia:</strong> Plazo Máx: {selectedHint.plazoMax} años,
+            Tasa Recomendada: {selectedHint.tasaRange},
             Monto Máx Fin: {selectedHint.montoFinMax}
           </div>
         )}
 
         <label>Monto Solicitado *</label>
         <input
-          type="number"
+          type="text"
           name="montoSolicitado"
-          value={formData.montoSolicitado}
-          onChange={handleChange}
+          placeholder="$ 3.000.000"
+          value={formatMoney(formData.montoSolicitado)}
+          onChange={(e) => handleMoneyChange('montoSolicitado', e)}
           required
         />
 
@@ -162,6 +179,7 @@ function LoanApplication() {
         <input
           type="number"
           name="plazoSolicitado"
+          placeholder="Ej: 15"
           value={formData.plazoSolicitado}
           onChange={handleChange}
           required
@@ -172,6 +190,7 @@ function LoanApplication() {
           type="number"
           step="0.1"
           name="tasaInteres"
+          placeholder="Ej: 4.5"
           value={formData.tasaInteres}
           onChange={handleChange}
           required
@@ -179,13 +198,14 @@ function LoanApplication() {
 
         <label>Valor de la Propiedad</label>
         <input
-          type="number"
+          type="text"
           name="valorPropiedad"
-          value={formData.valorPropiedad}
-          onChange={handleChange}
+          placeholder="$ 10.000.000"
+          value={formatMoney(formData.valorPropiedad)}
+          onChange={(e) => handleMoneyChange('valorPropiedad', e)}
         />
 
-        <label>Comprobante de Avaluo *</label>
+        <label>Comprobante de Avalúo *</label>
         <input
           type="file"
           onChange={(e) => setAvaluoFile(e.target.files[0])}
@@ -203,6 +223,7 @@ function LoanApplication() {
         <input
           type="text"
           name="nombreCompleto"
+          placeholder="Ej: Juan Pérez"
           value={formData.nombreCompleto}
           onChange={handleChange}
           required

@@ -5,7 +5,8 @@ import { useNavigate } from 'react-router-dom'
 import '../styles/styles.css'
 
 function Simulation() {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
+
   const [simData, setSimData] = useState({
     montoDeseado: '',
     plazo: '',
@@ -14,20 +15,34 @@ function Simulation() {
     seguros: '',
     comisiones: ''
   })
+
   const [result, setResult] = useState(null)
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
 
-
-  // Maneja cambios en el formulario
-  const handleChange = (e) => {
-    setSimData({
-      ...simData,
-      [e.target.name]: e.target.value
-    })
+  // Formateo de montos
+  const formatMoney = (value) => {
+    if (!value) return ''
+    let numeric = value.replace(/\D/g, '')
+    if (!numeric) return ''
+    let number = parseInt(numeric, 10)
+    return '$ ' + number.toLocaleString('es-CL')
   }
 
-  // Botón "Limpiar"
+  const handleMoneyChange = (fieldName, e) => {
+    let sinFormatear = e.target.value.replace(/\D/g, '')
+    setSimData({ ...simData, [fieldName]: sinFormatear })
+  }
+
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setSimData({
+      ...simData,
+      [name]: value
+    })
+    setError('')
+  }
+
   const handleClear = () => {
     setSimData({
       montoDeseado: '',
@@ -42,13 +57,13 @@ function Simulation() {
     setMessage('')
   }
 
-  // Botón "Volver a Inicio"
   const handleGoHome = () => {
-    navigate('/') // Ahora navigate está disponible aquí
+    navigate('/')
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+
     if (!simData.montoDeseado || !simData.plazo || !simData.tasaInteres) {
       setError('Por favor llena los campos obligatorios.')
       setMessage('')
@@ -59,14 +74,16 @@ function Simulation() {
     if (!confirmed) return
 
     try {
-      const response = await simulateLoan({
-        montoDeseado: parseFloat(simData.montoDeseado),
-        plazo: parseInt(simData.plazo),
+      let payload = {
+        montoDeseado: simData.montoDeseado ? parseInt(simData.montoDeseado, 10) : 0,
+        plazo: parseInt(simData.plazo, 10),
         tasaInteres: parseFloat(simData.tasaInteres),
         tipoPrestamo: simData.tipoPrestamo,
-        seguros: parseFloat(simData.seguros) || 0,
-        comisiones: parseFloat(simData.comisiones) || 0
-      })
+        seguros: simData.seguros ? parseInt(simData.seguros, 10) : 0,
+        comisiones: simData.comisiones ? parseInt(simData.comisiones, 10) : 0
+      }
+
+      const response = await simulateLoan(payload)
       setResult(response)
       setError('')
       setMessage('Simulación exitosa.')
@@ -81,18 +98,21 @@ function Simulation() {
     <div className="form-section">
       <h2>Simulación de Préstamo</h2>
       <form onSubmit={handleSubmit}>
+        
         <label>Monto Deseado *</label>
         <input
-          type="number"
+          type="text"
           name="montoDeseado"
-          value={simData.montoDeseado}
-          onChange={handleChange}
+          placeholder="$ 3.000.000"
+          value={formatMoney(simData.montoDeseado)}
+          onChange={(e) => handleMoneyChange('montoDeseado', e)}
         />
 
         <label>Plazo (años) *</label>
         <input
           type="number"
           name="plazo"
+          placeholder="Ej: 20"
           value={simData.plazo}
           onChange={handleChange}
         />
@@ -100,7 +120,9 @@ function Simulation() {
         <label>Tasa de Interés (%) *</label>
         <input
           type="number"
+          step="0.1"
           name="tasaInteres"
+          placeholder="Ej: 4.0"
           value={simData.tasaInteres}
           onChange={handleChange}
         />
@@ -119,18 +141,20 @@ function Simulation() {
 
         <label>Costos de Seguros (opcional)</label>
         <input
-          type="number"
+          type="text"
           name="seguros"
-          value={simData.seguros}
-          onChange={handleChange}
+          placeholder="$ 50.000"
+          value={formatMoney(simData.seguros)}
+          onChange={(e) => handleMoneyChange('seguros', e)}
         />
 
         <label>Comisiones (opcional)</label>
         <input
-          type="number"
+          type="text"
           name="comisiones"
-          value={simData.comisiones}
-          onChange={handleChange}
+          placeholder="$ 15.000"
+          value={formatMoney(simData.comisiones)}
+          onChange={(e) => handleMoneyChange('comisiones', e)}
         />
 
         <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>

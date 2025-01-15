@@ -1,23 +1,47 @@
 // src/components/LoanStatus.jsx
 import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'
 import { getAllLoans, getLoansByUserName, deleteLoan } from '../services/loanService'
 import '../styles/styles.css'
 
 function LoanStatus() {
-  const navigate = useNavigate(); // <-- Tiene que estar para navegar 
+  const navigate = useNavigate()
   const [loans, setLoans] = useState([])
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
   const [searchName, setSearchName] = useState('')
 
-  // Para controlar el modal de confirmación de eliminación
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [loanToDelete, setLoanToDelete] = useState(null)
 
-  // Datos que el usuario debe ingresar para confirmar la eliminación
   const [confirmName, setConfirmName] = useState('')
-  const [confirmID, setConfirmID] = useState('')
+  const [confirmID, setConfirmID] = useState('') // Se formatea como RUT
+
+  // Formatear dinero
+  const formatMoney = (value) => {
+    if (!value) return ''
+    let numeric = value.toString().replace(/\D/g, '')
+    if (!numeric) return ''
+    let number = parseInt(numeric, 10)
+    return '$ ' + number.toLocaleString('es-CL')
+  }
+
+  // Formatear RUT
+  const formatRut = (rut) => {
+    let limpio = rut.replace(/[^\dkK]/g, '').toUpperCase()
+    if (limpio.length > 1) {
+      let cuerpo = limpio.slice(0, -1)
+      let dv = limpio.slice(-1)
+      let formateado = ''
+      while (cuerpo.length > 3) {
+        formateado = '.' + cuerpo.slice(-3) + formateado
+        cuerpo = cuerpo.slice(0, -3)
+      }
+      formateado = cuerpo + formateado + '-' + dv
+      return formateado
+    }
+    return limpio
+  }
 
   useEffect(() => {
     fetchAllLoans()
@@ -56,27 +80,11 @@ function LoanStatus() {
     fetchAllLoans()
   }
 
-  // Botón "Volver a Inicio"
   const handleGoHome = () => {
     navigate('/')
   }
 
-  // Formateo de fecha, para que no se vea el formato "2025-01-11T18:44:46.716031"
-  const formatDateTime = (isoString) => {
-    if (!isoString) return '---'
-    const date = new Date(isoString)
-    return date.toLocaleString('es-CL', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    })
-  }
-
-  // ─────────────────────────────────────────────────────────
-  // 1. Manejo del Modal de Eliminación
-  // ─────────────────────────────────────────────────────────
+  // Mostrar el modal
   const handleShowDeleteModal = (loan) => {
     setLoanToDelete(loan)
     setConfirmName('')
@@ -84,42 +92,36 @@ function LoanStatus() {
     setShowDeleteModal(true)
   }
 
+  // Cerrar modal
   const handleCloseDeleteModal = () => {
     setShowDeleteModal(false)
     setLoanToDelete(null)
   }
 
-  // ─────────────────────────────────────────────────────────
-  // 2. Confirmar eliminación
-  // ─────────────────────────────────────────────────────────
   const handleConfirmDelete = async () => {
     if (!loanToDelete) return
 
-    // Verificamos que el nombre y la identificación coincidan
-    // con la información de la solicitud
     const usuario = loanToDelete.usuario
     if (!usuario) {
-      // Si no hay usuario, mostramos error
       setError('No se pudo verificar el usuario de esta solicitud.')
       return
     }
 
-    // Comparar confirmName e ID con los datos del loanToDelete
+    // Comparar confirmName e ID
     const nameMatches = confirmName.trim().toLowerCase() === usuario.nombreCompleto.trim().toLowerCase()
-    const idMatches = confirmID.trim() === (usuario.numeroIdentificacion || '').trim()
+    const idMatches = confirmID.replace(/\./g, '').replace('-', '').trim().toLowerCase() === 
+      (usuario.numeroIdentificacion || '').replace(/\./g, '').replace('-', '').trim().toLowerCase()
 
     if (!nameMatches || !idMatches) {
       alert('Los datos no coinciden. Asegúrate de ingresar tu nombre completo y número de identificación exactamente como en la solicitud.')
       return
     }
 
-    // Si todo coincide, procedemos a eliminar la solicitud
     try {
       await deleteLoan(loanToDelete.idSolicitud)
       setMessage(`Solicitud #${loanToDelete.idSolicitud} eliminada con éxito.`)
       setError('')
       handleCloseDeleteModal()
-      // Recargamos la lista
       fetchAllLoans()
     } catch (err) {
       setError('Error al eliminar la solicitud.')
@@ -145,9 +147,9 @@ function LoanStatus() {
           <button onClick={handleSearchByName} className="btn-primary">
             Buscar
           </button>
-          <button 
-            onClick={handleClearSearch} 
-            className="btn-primary" 
+          <button
+            onClick={handleClearSearch}
+            className="btn-primary"
             style={{ backgroundColor: '#6c757d' }}
           >
             Limpiar
@@ -159,7 +161,6 @@ function LoanStatus() {
           >
             Volver a Inicio
           </button>
-          
         </div>
       </div>
 
@@ -182,13 +183,18 @@ function LoanStatus() {
                 <td>{loan.idSolicitud}</td>
                 <td>{loan.usuario?.nombreCompleto || 'N/D'}</td>
                 <td>{loan.tipoPrestamo}</td>
-                <td>{loan.montoSolicitado}</td>
+                <td>{formatMoney(loan.montoSolicitado)}</td>
                 <td>{loan.estadoSolicitud}</td>
-                <td>{formatDateTime(loan.fechaSolicitud)}</td>
+                <td>
+                  {loan.fechaSolicitud 
+                    ? new Date(loan.fechaSolicitud).toLocaleString('es-CL')
+                    : '---'
+                  }
+                </td>
                 <td>
                   <button
                     className="btn-primary"
-                    style={{ backgroundColor: '#dc3545' }} // rojo
+                    style={{ backgroundColor: '#dc3545' }}
                     onClick={() => handleShowDeleteModal(loan)}
                   >
                     Eliminar
@@ -222,21 +228,23 @@ function LoanStatus() {
             <h3>Eliminar Solicitud #{loanToDelete.idSolicitud}</h3>
             <p>
               Para confirmar la eliminación de la solicitud, <br />
-              ingresa tu <strong>Nombre Completo</strong> y <strong>tu Número de Identificación</strong>:
+              ingresa tu <strong>Nombre Completo</strong> y <strong>tu Número de Identificación (RUT)</strong>:
             </p>
             <label>Nombre Completo</label>
             <input
               type="text"
+              placeholder="Ej: Juan Pérez"
               value={confirmName}
               onChange={(e) => setConfirmName(e.target.value)}
               style={{ marginBottom: '0.5rem', width: '100%' }}
             />
 
-            <label>Número de Identificación</label>
+            <label>Número de Identificación (RUT)</label>
             <input
               type="text"
+              placeholder="12.345.678-9"
               value={confirmID}
-              onChange={(e) => setConfirmID(e.target.value)}
+              onChange={(e) => setConfirmID(formatRut(e.target.value))}
               style={{ marginBottom: '0.5rem', width: '100%' }}
             />
 
@@ -256,7 +264,6 @@ function LoanStatus() {
                 Eliminar
               </button>
             </div>
-
           </div>
         </div>
       )}
